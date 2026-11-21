@@ -59,6 +59,7 @@ Texte stehen in Dateien unter `src/main/resources/story/`, nicht im Code, und k�
 | [Ideen.md](Ideen.md) | Ideen, Entscheidungen und Feinschliff |
 | [agents.md](agents.md) | Anweisungen für KI-Agenten |
 | [PromptDiary.md](PromptDiary.md) | Protokoll der Zusammenarbeit mit Claude Code |
+| [Uebergabe.md](Uebergabe.md) | Projektstand und alles, was ein neuer Chat zum Weiterarbeiten braucht |
 
 ## Die ursprüngliche Projektidee
 

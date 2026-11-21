@@ -4,8 +4,12 @@
 Textbasierter Dungeon Crawler in Java. Der Spieler wählt eine Klasse (z. B. Mage, Rogue) und erlebt eine Geschichte mit RNG-basierten Skillchecks (D20, D10, D6).
 
 Siehe auch:
+- `Uebergabe.md` – **zuerst lesen**: Projektstand, Arbeitsweise des Autors, Umgebung, Architektur, offene Punkte
 - `Ideen.md` – erste Ideen, getroffene Entscheidungen und offene Fragen
-- `features.md` – nummerierte Feature-Liste
+- `features.md` – nummerierte Feature-Liste mit Häkchen
+- `manual.md` – Bedienung des Spiels, `PromptDiary.md` – Protokoll der Zusammenarbeit
+
+Am Ende jeder Sitzung `Uebergabe.md`, `PromptDiary.md`, `Ideen.md` und `features.md` aktualisieren, damit ein neuer Chat nahtlos weiterarbeiten kann.
 
 ## Grundregeln
 - Sprache: Java, Konsolenanwendung, keine GUI.

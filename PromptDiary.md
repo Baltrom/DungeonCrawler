@@ -25,7 +25,7 @@ Die Datei wurde am Ende von Version 1 aus dem Gesprächsverlauf geschrieben. Die
 | 3. Projektgerüst | 20–24 | Maven-Projekt, Würfel, Charaktere, Klassenauswahl, `.gitignore` |
 | 4. Version 1 bauen | 25–26 | Hauptmenü, Skillchecks, Items, Räume, Kampf, Rangliste, Speichern und Laden |
 | 5. Feinschliff | 27–29 | Balance, Anzeige der Ergebnisse, freie und versperrte Räume, Untersuchen mit Verzweigungen, Flavourtext |
-| 6. Abgabe von V1 | 30 | Handbuch, README, Feature-Häkchen, dieses Diary, Abgleich mit GitHub |
+| 6. Abgabe von V1 | 30–31 | Handbuch, README, Feature-Häkchen, dieses Diary, Abgleich mit GitHub, Übergabe-Datei für neue Chats |
 
 ---
 
@@ -408,6 +408,14 @@ Zwischen den Punkten wurde die Reihenfolge angepasst (Items vor Räumen, weil R�
 > lokal und auf github soll auf gleichem stand sein
 
 **Antwort:** Claude prüfte die Abgabepunkte: Code und Kompilierung (Punkt 1 und 2) waren erfüllt. Neu geschrieben wurden `manual.md` (Bedienung), `Readme.md` (README, mit der ursprünglichen Projektidee des Autors in UTF-8), die Häkchen in `features.md`, die Bereinigung von `agents.md` und dieses `PromptDiary.md`. Ein bestehendes Prompt Diary gab es nur als `Prompt Diary.pdf` mit der ursprünglichen Projektidee (vom Autor). Danach wurden Kompilierung und Tests geprüft, alles committet, auf `main` gepusht und lokal und auf GitHub verglichen.
+
+### Prompt 31
+> 1 ignore
+> 2 lokale branches löschen
+> 3 ja
+> 4 wichtig dass alles was wir machen  in einer MD datei ist damit ich in neuem chat weiterarbeiten kann
+
+**Antwort:** Die zwei alten lokalen Branches wurden gelöscht (beide waren in `main` enthalten), `Ideen.zip` bleibt im Repository. Für den Wunsch aus Punkt 4 schrieb Claude [Uebergabe.md](Uebergabe.md): Projektstand, Arbeitsweise des Autors, Umgebung und Stolpersteine, Architektur, Format der Raumdateien, Spielwerte, Tests, Git-Stand, offene Punkte für die nächste Sitzung und eine Checkliste zum Sitzungsende. Die Balance-Simulation liegt jetzt als `tools/BalanceSim.java` im Repository, damit sie nicht verloren geht. `agents.md` und die README verweisen auf die Übergabe-Datei, und dieses Diary wird am Ende jeder Sitzung ergänzt.
 
 ---
 
