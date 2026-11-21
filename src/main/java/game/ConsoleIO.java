@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConsoleIO {
 
@@ -15,6 +17,7 @@ public class ConsoleIO {
 
     private final BufferedReader reader;
     private final PrintStream out;
+    private final List<String> recentResults = new ArrayList<>();
 
     public ConsoleIO() {
         this(System.in, System.out);
@@ -25,10 +28,32 @@ public class ConsoleIO {
         this.out = out;
     }
 
+    /**
+     * Leert den Bildschirm mit Leerzeilen. Danach stehen als erster Textblock die Ergebnisse,
+     * die seit dem letzten Leeren mit report() gemeldet wurden, damit man sieht, was passiert ist.
+     */
     public void clearScreen() {
         for (int i = 0; i < CLEAR_LINES; i++) {
             out.println();
         }
+        if (!recentResults.isEmpty()) {
+            out.println("--- Was zuletzt geschah ---");
+            for (String line : recentResults) {
+                out.println(line);
+            }
+            out.println("---------------------------");
+            out.println();
+            recentResults.clear();
+        }
+    }
+
+    /**
+     * Meldet ein Ergebnis (Wurf, Treffer, Fund, ...). Es wird sofort ausgegeben und nach dem naechsten
+     * clearScreen() noch einmal ganz oben gezeigt.
+     */
+    public void report(String text) {
+        out.println(text);
+        recentResults.add(text);
     }
 
     public void println() {

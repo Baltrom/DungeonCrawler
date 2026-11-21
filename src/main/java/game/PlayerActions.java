@@ -27,7 +27,7 @@ class PlayerActions {
     boolean drinkPotion() {
         List<Item> options = Arrays.stream(Item.values()).filter(player::canDrink).toList();
         if (options.isEmpty()) {
-            io.println("Du hast keinen Trank, den du trinken kannst.");
+            io.report("Du hast keinen Trank, den du trinken kannst.");
             return false;
         }
         io.println();
@@ -45,10 +45,10 @@ class PlayerActions {
         int hpBefore = player.getCurrentHp();
         player.drink(potion);
         if (potion == Item.HEALING_POTION) {
-            io.println("Du trinkst den Heiltrank und heilst " + (player.getCurrentHp() - hpBefore)
+            io.report("Du trinkst den Heiltrank und heilst " + (player.getCurrentHp() - hpBefore)
                     + " Lebenspunkte.");
         } else {
-            io.println("Du trinkst den Ladungstrank. Deine Zauberladungen sind wieder voll.");
+            io.report("Du trinkst den Ladungstrank. Deine Zauberladungen sind wieder voll.");
         }
         return true;
     }
@@ -59,7 +59,7 @@ class PlayerActions {
      */
     Spell chooseSpell(boolean inCombat) {
         if (player.getSpellCharges() <= 0) {
-            io.println("Du hast keine Zauberladungen mehr.");
+            io.report("Du hast keine Zauberladungen mehr.");
             return null;
         }
         List<Spell> options = Arrays.stream(Spell.values())

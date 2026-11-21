@@ -48,6 +48,8 @@ public class Game {
     private int roomsReached;
     private RoomProgress progress;
     private boolean arcaneSight;
+    private String header = "";
+    private List<String> description = List.of();
 
     /** Neues Spiel: beginnt mit der Einleitung in Raum 0. */
     public Game(ConsoleIO io, Dice dice, Player player, Dungeon dungeon, SaveManager saveManager) {
@@ -145,13 +147,9 @@ public class Game {
                 textName = room.template().getTextName();
             }
         }
-        io.clearScreen();
-        io.println(LINE);
-        io.println(title);
-        io.println(LINE);
-        for (String line : StoryText.load(textName)) {
-            io.println(line);
-        }
+        // Angezeigt wird beides bei jedem Menue dieses Raums, nachdem der Bildschirm geleert wurde
+        header = title;
+        description = StoryText.load(textName);
     }
 
     private RoomResult roomMenu(Room room) {
@@ -210,8 +208,7 @@ public class Game {
     }
 
     private RoomResult playBossRoom(Room room) {
-        io.println();
-        io.println("Am Eingang der Halle steht ein kleiner Trank, als haette ihn jemand fuer dich bereitgestellt.");
+        io.report("Am Eingang der Halle steht ein kleiner Trank, als haette ihn jemand fuer dich bereitgestellt.");
         receiveItem(Item.HEALING_POTION);
         boolean won = encounter(Enemy.deadKing(), room.encounterTarget(), Difficulty.HARD);
         return won ? RoomResult.WON : RoomResult.DEAD;
@@ -229,20 +226,19 @@ public class Game {
             arcaneSight = false;
         }
         CheckResult result = SkillCheck.roll(dice, bonus, target);
-        io.println(result.describe(label));
+        io.report(result.describe(label));
         return result;
     }
 
     void tryLoot(LootSpot spot) {
         progress.lootTried = true;
-        io.println();
         CheckResult result = check(spot.attribute(), spot.target());
         if (!result.success()) {
-            io.println("Es gelingt dir nicht. Zum Glueck passiert nichts.");
+            io.report("Es gelingt dir nicht. Zum Glueck passiert nichts.");
             return;
         }
         if (spot.item() == null) {
-            io.println("Das Versteck ist leer. Jemand war vor dir hier.");
+            io.report("Das Versteck ist leer. Jemand war vor dir hier.");
             return;
         }
         receiveItem(spot.item());
@@ -250,9 +246,9 @@ public class Game {
 
     /** Nimmt ein Item auf. Ist das Inventar voll, entscheidet der Spieler, was weg soll. */
     void receiveItem(Item item) {
-        io.println("Du findest: " + item.getDisplayName() + " (" + item.getDescription() + ")");
+        io.report("Du findest: " + item.getDisplayName() + " (" + item.getDescription() + ")");
         if (player.addItem(item)) {
-            io.println(item.getDisplayName() + " kommt in dein Inventar.");
+            io.report(item.getDisplayName() + " kommt in dein Inventar.");
             return;
         }
         io.println("Dein Inventar ist voll (" + Inventory.CAPACITY + "/" + Inventory.CAPACITY
@@ -265,20 +261,19 @@ public class Game {
         io.println("[" + leave + "] " + item.getDisplayName() + " liegen lassen");
         int choice = io.askChoice("Deine Wahl: ", 1, leave);
         if (choice == leave) {
-            io.println("Du laesst " + item.getDisplayName() + " liegen.");
+            io.report("Du laesst " + item.getDisplayName() + " liegen.");
             return;
         }
         Item dropped = items.get(choice - 1);
         player.removeItem(dropped);
         player.addItem(item);
-        io.println("Du wirfst " + dropped.getDisplayName() + " weg und nimmst " + item.getDisplayName() + ".");
+        io.report("Du wirfst " + dropped.getDisplayName() + " weg und nimmst " + item.getDisplayName() + ".");
     }
 
     RoomResult attemptWay(WayOption way) {
-        io.println();
         CheckResult result = check(way.approach().attribute(), way.target());
         if (result.success()) {
-            io.println("Du kommst durch.");
+            io.report("Du kommst durch.");
             return RoomResult.NEXT;
         }
         return triggerTrap(result.isNaturalOne());
@@ -286,26 +281,26 @@ public class Game {
 
     /** Eine Falle: bei einem Patzer (1) toedlich, sonst 2xD6 Schaden. */
     RoomResult triggerTrap(boolean deadly) {
-        io.println("Eine Falle schnappt zu!");
+        io.report("Eine Falle schnappt zu!");
         if (deadly) {
-            io.println("Du bist voellig unvorbereitet. Die Falle ist toedlich.");
+            io.report("Du bist voellig unvorbereitet. Die Falle ist toedlich.");
             player.takeDamage(player.getCurrentHp());
             return RoomResult.DEAD;
         }
         int damage = dice.rollD6() + dice.rollD6();
         player.takeDamage(damage);
-        io.println("Du nimmst " + damage + " Schaden (2xD6).");
+        io.report("Du nimmst " + damage + " Schaden (2xD6).");
         if (!player.isAlive()) {
-            io.println("Die Verletzungen sind zu schwer.");
+            io.report("Die Verletzungen sind zu schwer.");
             return RoomResult.DEAD;
         }
-        io.println("Verletzt kaempfst du dich weiter.");
+        io.report("Verletzt kaempfst du dich weiter.");
         return RoomResult.NEXT;
     }
 
     RoomResult useKey() {
         player.removeItem(Item.IRON_KEY);
-        io.println("Der Schluessel dreht sich knirschend im Schloss und zerbricht.");
+        io.report("Der Schluessel dreht sich knirschend im Schloss und zerbricht.");
         return RoomResult.NEXT;
     }
 
@@ -313,34 +308,31 @@ public class Game {
 
     private RoomResult examineStatue(Room room) {
         progress.specialDone = true;
-        io.println();
         CheckResult result = check(Attribute.INTELLIGENCE, room.encounterTarget());
         boolean playerFirst;
         if (result.success()) {
-            io.println("Du erkennst die Zeichen auf dem Sockel und weisst, wann die Statue erwacht.");
+            io.report("Du erkennst die Zeichen auf dem Sockel und weisst, wann die Statue erwacht.");
             playerFirst = true;
         } else {
-            io.println("Die Statue erwacht, kaum dass du sie beruehrst!");
+            io.report("Die Statue erwacht, kaum dass du sie beruehrst!");
             playerFirst = coinToss();
         }
         if (!fight(Enemy.gargoyle(), playerFirst, false)) {
             return RoomResult.DEAD;
         }
-        io.println("Die Gargoyle zerfaellt zu Geroell.");
+        io.report("Die Gargoyle zerfaellt zu Geroell.");
         receiveItem(room.enemyItem());
         return null;
     }
 
     /** Begegnung mit einem Gegner: Schleichen oder Spaehen verschaffen den ersten Zug, sonst Muenzwurf. */
     private boolean encounter(Enemy enemy, int target, Difficulty difficulty) {
-        io.println();
-        io.println("Ein Gegner: " + enemy.name() + "!");
         String level = difficulty.getDisplayName();
         List<String> labels = List.of(
                 "Schleichen (Geschick, " + level + ")",
                 "Spaehen (Intelligenz, " + level + ")",
                 "Sofort angreifen (Muenzwurf entscheidet, wer beginnt)");
-        int choice = chooseAction("Wie gehst du vor?", labels);
+        int choice = chooseAction("Wie gehst du vor?", labels, List.of("Ein Gegner: " + enemy.name() + "!"));
 
         boolean playerFirst;
         boolean ambush = false;
@@ -353,12 +345,12 @@ public class Game {
                 playerFirst = true;
                 if (sneaking && player.getCharacterClass() == CharacterClass.ROGUE) {
                     ambush = true;
-                    io.println("Du schleichst dich von hinten an. Dein erster Treffer wird doppelten Schaden machen.");
+                    io.report("Du schleichst dich von hinten an. Dein erster Treffer wird doppelten Schaden machen.");
                 } else {
-                    io.println("Unbemerkt gewinnst du den ersten Zug.");
+                    io.report("Unbemerkt gewinnst du den ersten Zug.");
                 }
             } else {
-                io.println("Du wirst bemerkt.");
+                io.report("Du wirst bemerkt.");
                 playerFirst = coinToss();
             }
         }
@@ -367,7 +359,7 @@ public class Game {
 
     boolean coinToss() {
         boolean playerFirst = dice.roll(2) == 1;
-        io.println("Muenzwurf: " + (playerFirst ? "Du beginnst." : "Der Gegner beginnt."));
+        io.report("Muenzwurf: " + (playerFirst ? "Du beginnst." : "Der Gegner beginnt."));
         return playerFirst;
     }
 
@@ -379,7 +371,25 @@ public class Game {
 
     /** Zeigt ein Auswahlmenue. Trank trinken und Zauber wirken stehen in jedem Menue zusaetzlich zur Wahl. */
     int chooseAction(String title, List<String> labels) {
+        return chooseAction(title, labels, List.of());
+    }
+
+    /**
+     * Jedes Menue beginnt mit geleertem Bildschirm. Ganz oben stehen die Ergebnisse der letzten Aktion,
+     * danach der Raum, der Status und die Auswahl.
+     */
+    int chooseAction(String title, List<String> labels, List<String> sceneLines) {
         while (true) {
+            io.clearScreen();
+            io.println(LINE);
+            io.println(header);
+            io.println(LINE);
+            for (String line : description) {
+                io.println(line);
+            }
+            for (String line : sceneLines) {
+                io.println(line);
+            }
             io.println();
             for (String line : actions.statusLines()) {
                 io.println(line);
@@ -417,13 +427,13 @@ public class Game {
 
     private void castExplorationSpell() {
         if (arcaneSight) {
-            io.println("Arkane Sicht wirkt bereits.");
+            io.report("Arkane Sicht wirkt bereits.");
             return;
         }
         Spell spell = actions.chooseSpell(false);
         if (spell == Spell.ARCANE_SIGHT) {
             arcaneSight = true;
-            io.println("Die Runen leuchten auf. Dein naechster Intelligenz-Check bekommt +"
+            io.report("Die Runen leuchten auf. Dein naechster Intelligenz-Check bekommt +"
                     + Spell.ARCANE_SIGHT_BONUS + ".");
         }
     }

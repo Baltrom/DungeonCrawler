@@ -41,10 +41,7 @@ class Combat {
      */
     boolean run(boolean playerFirst, boolean ambush) {
         this.ambushReady = ambush;
-        io.println();
-        io.println(LINE);
-        io.println("KAMPF: " + enemy.name());
-        io.println(LINE);
+        io.report("Der Kampf gegen " + enemy.name() + " beginnt!");
 
         boolean playerTurn = playerFirst;
         while (player.isAlive() && enemyHp > 0) {
@@ -56,12 +53,11 @@ class Combat {
             playerTurn = !playerTurn;
         }
 
-        io.println();
         if (player.isAlive()) {
-            io.println("Du hast " + enemy.name() + " besiegt!");
+            io.report("Du hast " + enemy.name() + " besiegt!");
             return true;
         }
-        io.println(enemy.name() + " hat dich besiegt.");
+        io.report(enemy.name() + " hat dich besiegt.");
         return false;
     }
 
@@ -69,7 +65,11 @@ class Combat {
 
     private void playerTurn() {
         while (true) {
-            io.println();
+            // Der Bildschirm wird geleert, ganz oben stehen die Ergebnisse der letzten Zuege
+            io.clearScreen();
+            io.println(LINE);
+            io.println("KAMPF: " + enemy.name());
+            io.println(LINE);
             for (String line : actions.statusLines()) {
                 io.println(line);
             }
@@ -116,7 +116,7 @@ class Combat {
         int roll = dice.rollD20();
         int bonus = player.getAttackBonus();
         boolean hit = hits(roll, bonus, enemy.armorClass());
-        io.println("Dein Angriff: Wurf " + roll + " + " + bonus + " = " + (roll + bonus)
+        io.report("Dein Angriff: Wurf " + roll + " + " + bonus + " = " + (roll + bonus)
                 + " gegen RK " + enemy.armorClass() + " -> " + (hit ? "TREFFER" : "VERFEHLT"));
         if (!hit) {
             return;
@@ -125,7 +125,7 @@ class Combat {
         if (ambushReady) {
             ambushReady = false;
             damage += dice.roll(player.getCharacterClass().getDamageDie());
-            io.println("Hinterhalt: doppelter Schaden!");
+            io.report("Hinterhalt: doppelter Schaden!");
         }
         damage += player.getDamageBonus();
         damageEnemy(damage);
@@ -134,12 +134,12 @@ class Combat {
     private void cast(Spell spell) {
         switch (spell) {
             case FIREBALL -> {
-                io.println("Du schleuderst einen Feuerball. Er trifft immer.");
+                io.report("Du schleuderst einen Feuerball. Er trifft immer.");
                 damageEnemy(dice.rollD10());
             }
             case SHIELD -> {
                 shieldBonus += Spell.SHIELD_BONUS;
-                io.println("Ein Schild aus Licht umgibt dich (+" + Spell.SHIELD_BONUS + " Ruestungsklasse).");
+                io.report("Ein Schild aus Licht umgibt dich (+" + Spell.SHIELD_BONUS + " Ruestungsklasse).");
             }
             default -> throw new IllegalStateException("Spell not usable in combat: " + spell);
         }
@@ -147,7 +147,7 @@ class Combat {
 
     private void damageEnemy(int damage) {
         enemyHp = Math.max(0, enemyHp - damage);
-        io.println(enemy.name() + " nimmt " + damage + " Schaden.");
+        io.report(enemy.name() + " nimmt " + damage + " Schaden.");
     }
 
     // --- Zug des Gegners ---
@@ -156,7 +156,7 @@ class Combat {
         int roll = dice.rollD20();
         int armorClass = player.getArmorClass() + shieldBonus;
         boolean hit = hits(roll, enemy.attackBonus(), armorClass);
-        io.println(enemy.name() + " greift an: Wurf " + roll + " + " + enemy.attackBonus() + " = "
+        io.report(enemy.name() + " greift an: Wurf " + roll + " + " + enemy.attackBonus() + " = "
                 + (roll + enemy.attackBonus()) + " gegen deine RK " + armorClass
                 + " -> " + (hit ? "TREFFER" : "VERFEHLT"));
         if (!hit) {
@@ -164,7 +164,7 @@ class Combat {
         }
         int damage = dice.roll(enemy.damageDie());
         player.takeDamage(damage);
-        io.println("Du nimmst " + damage + " Schaden.");
+        io.report("Du nimmst " + damage + " Schaden.");
     }
 
     /** Eine 1 verfehlt immer, eine 20 trifft immer, sonst zaehlt Wurf + Bonus gegen die Ruestungsklasse. */

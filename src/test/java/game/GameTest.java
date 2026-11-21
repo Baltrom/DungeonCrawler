@@ -196,6 +196,20 @@ class GameTest {
         assertTrue(printed().contains("wirkt bereits"));
     }
 
+    @Test
+    void theResultOfAnActionIsShownAtTheTopOfTheNextScreen() {
+        Player rogue = new Player("Bob", CharacterClass.ROGUE);
+        // Beute versuchen (1, Wurf 20, Schutzamulett), danach erscheint das Menue neu, dann Tor (1)
+        Game game = gameAt(0, new FixedDice(20), rogue, io("1", "1"));
+        game.playRoom();
+
+        String text = printed();
+        int block = text.lastIndexOf("--- Was zuletzt geschah ---");
+        assertTrue(block > 0, "The result block is missing");
+        String lastScreen = text.substring(block);
+        assertTrue(lastScreen.indexOf("Schutzamulett kommt in dein Inventar.") < lastScreen.indexOf("RAUM 0"));
+    }
+
     // --- Speichern und Laden ---
 
     @Test
