@@ -57,11 +57,15 @@ Zum Spielen `game.Main` starten. Beim Spielen entstehen `savegame.txt` und `high
 4. Nach Änderungen kurz zusammenfassen, was geändert wurde.
 5. Keine Dateien löschen oder überschreiben, ohne es vorher anzusprechen.
 
-## Offene Entscheidungen
-Entschieden:
+## Stand und Entscheidungen
+Version 1 ist umgesetzt (Details in `Ideen.md`, `features.md`, Bedienung in `manual.md`):
 - Eingabesystem: nummerierte Auswahl (1–3, 1–5), kein Freitext
-- Zwei Klassen: Magier und Schurke
-- Erste Version: 5 Räume (Raum 0 = draußen), Menü, Klassenwahl mit ASCII-Bildern, Würfelmechanik, Skillchecks, Kampf, Items, Rangliste, Speichern und Laden (Details in `Ideen.md` und `features.md`)
+- Zwei Klassen: Magier und Schurke, Attribute 1–5, Magier 3 Zauberladungen
+- 5 Räume (Raum 0 = draußen) aus einem Seed, freie und versperrte Räume, Untersuchen mit Verzweigungen, Hinweise und Erkenntnis
+- Würfelmechanik mit angezeigtem Wurfergebnis, Skillchecks, Kampf, Items (5 Plätze), Rangliste, Speichern und Laden
+- Flavourtext zu jeder Aktion; Ergebnisse stehen im nächsten Textblock nach dem Leeren des Bildschirms
+- Balance nach dem Feinschliff: Magier 14 Lebenspunkte, Falle 1W6 (Patzer 2W6), schwächere Gegner
 
-Noch offen:
-- Alles unter „Als Nächstes besprechen“ und „Noch zu klären“ in `Ideen.md` (z. B. Magier-Zauber, Rüstungsklasse, konkrete Items, Gegner)
+Noch offen (nächste Besprechung):
+- Feinschliff-Liste aus dem nächsten Durchspielen
+- Spätere Versionen: mehr Räume und Raumvorlagen, mehr Items und Heiltränke, Endgegner mit Spezialangriffen, Zweitkriterium in der Rangliste (Lebenspunkte/Züge), Hilfe-Befehl im Spiel
