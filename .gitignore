@@ -1,0 +1,7 @@
+# Maven-Ausgabe
+target/
+
+# IntelliJ
+.idea/
+*.iml
+out/
