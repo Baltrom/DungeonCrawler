@@ -14,6 +14,7 @@ Siehe auch:
 - Nur das umsetzen, was gefragt ist. Keine ungefragten Refactorings oder neuen Abhängigkeiten.
 - Vor größeren Änderungen an der Struktur kurz nachfragen.
 - Konsolenausgabe nur in ASCII (ae/oe/ue statt Umlauten).
+- Story-Ton: düster (Gruft eines toten Königs). Raumvorlagen und Details stehen in `Ideen.md`.
 - Bildschirm „leeren“ nur über eine zentrale Methode `clearScreen()`, die viele Leerzeilen ausgibt.
 
 ## Code-Konventionen
