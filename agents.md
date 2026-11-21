@@ -21,6 +21,7 @@ Siehe auch:
 - Eine Klasse pro Datei, sinnvolle Pakete (z. B. `game`, `character`, `dice`, `story`).
 - Story-Text und Spiellogik trennen. Texte nicht tief in der Logik verstecken.
 - Würfel zentral in einer eigenen Klasse (z. B. `Dice`), damit Würfe testbar sind (z. B. mit festem Seed).
+- Zwei getrennte Zufallsgeneratoren (`Random`): einer für die Dungeon-Erzeugung (Seed, wird gespeichert), einer für die Würfe. Die Würfe im Spiel werden nicht mit dem Seed erzeugt, sondern fallen jedes Mal neu aus. Ein fester Seed für Würfe ist nur für Tests gedacht.
 - Kurze Kommentare nur dort, wo die Absicht nicht offensichtlich ist.
 
 ## Tests
@@ -35,6 +36,10 @@ Siehe auch:
 5. Keine Dateien löschen oder überschreiben, ohne es vorher anzusprechen.
 
 ## Offene Entscheidungen
-- Eingabesystem: Auswahlmenü (a/b/c/d) oder Freitext mit Schlagwörtern
-- Umfang des Dungeons (Anzahl Klassen ist entschieden: 2, Magier und Schurke)
-- Welche Features gehören in die erste Version (MVP)
+Entschieden:
+- Eingabesystem: nummerierte Auswahl (1–3, 1–5), kein Freitext
+- Zwei Klassen: Magier und Schurke
+- Erste Version: 5 Räume (Raum 0 = draußen), Menü, Klassenwahl mit ASCII-Bildern, Würfelmechanik, Skillchecks, Kampf, Items, Rangliste, Speichern und Laden (Details in `Ideen.md` und `features.md`)
+
+Noch offen:
+- Alles unter „Als Nächstes besprechen“ und „Noch zu klären“ in `Ideen.md` (z. B. Magier-Zauber, Rüstungsklasse, konkrete Items, Gegner)
