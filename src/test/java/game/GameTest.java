@@ -189,25 +189,41 @@ class GameTest {
 
     @Test
     void walkingThroughTheWholeDungeonWithPerfectRollsEndsInVictory() {
+        // Der Schurke schleicht sich immer an (Wurf 20) und trifft mit doppeltem Schaden (2xD10 = 20)
         List<String> script = new ArrayList<>();
         script.add("2"); // Raum 0: Gitter aufstossen (Beute ist 1)
         for (int i = 1; i <= 4; i++) {
             Room room = dungeon.room(i);
             if (room.enemy() == EnemyKind.ORDINARY) {
-                script.add("3"); // sofort angreifen
+                script.add("1"); // schleichen
+                script.add("1"); // angreifen
             }
             int firstWay = 1 + (room.enemy() == EnemyKind.SPECIAL ? 1 : 0) + 1;
             script.add(String.valueOf(firstWay));
         }
-        script.add("3"); // Endgegner: sofort angreifen
+        script.add("1"); // Endgegner: schleichen
+        script.add("1"); // angreifen
 
-        Player mage = new Player("Ria", CharacterClass.MAGE);
-        Game game = gameAt(0, new MaxDice(), mage, io(script.toArray(new String[0])));
+        Player rogue = new Player("Bob", CharacterClass.ROGUE);
+        Game game = gameAt(0, new MaxDice(), rogue, io(script.toArray(new String[0])));
         GameResult result = game.run();
 
         assertEquals(GameOutcome.VICTORY, result.outcome());
         assertEquals(5, result.roomsReached());
         assertTrue(printed().contains("RAUM 5 - Der Thronsaal"));
+        assertTrue(printed().contains("Du hast Der tote Koenig besiegt!"));
+        assertTrue(printed().contains("Hinterhalt"));
+    }
+
+    @Test
+    void dyingInTheBossFightEndsTheGameInRoomFive() {
+        Player mage = new Player("Ria", CharacterClass.MAGE);
+        mage.takeDamage(10);
+        // Menue (1) = Schleichen: Wurf 2 misslingt, Muenzwurf 2 = Gegner beginnt, trifft (20) mit 6 Schaden
+        Game game = gameAt(5, new FixedDice(2, 2, 20, 6), mage, io("1"));
+        GameResult result = game.run();
+        assertEquals(GameOutcome.DEATH, result.outcome());
+        assertEquals(5, result.roomsReached());
     }
 
     @Test

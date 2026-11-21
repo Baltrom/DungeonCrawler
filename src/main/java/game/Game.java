@@ -357,10 +357,8 @@ public class Game {
         return playerFirst;
     }
 
-    /** Platzhalter, bis der Kampf gebaut ist: der Spieler gewinnt. */
     boolean fight(Enemy enemy, boolean playerFirst, boolean ambush) {
-        io.println("(Der Kampf gegen " + enemy.name() + " ist noch nicht gebaut. Du gewinnst.)");
-        return true;
+        return new Combat(io, dice, player, enemy, actions).run(playerFirst, ambush);
     }
 
     // --- Menue mit Trank und Zauber ---
