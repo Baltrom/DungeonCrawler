@@ -4,9 +4,9 @@ import dice.Dice;
 
 public enum CharacterClass {
 
-    MAGE("Magier", "mage", 1, 2, 5, 12, 11, Dice.D6,
+    MAGE("Magier", "mage", 1, 2, 5, 12, 11, Dice.D6, Attribute.INTELLIGENCE, 3,
             "Alte Runen lesen, 3 Zauberladungen"),
-    ROGUE("Schurke", "rogue", 2, 5, 1, 16, 13, Dice.D10,
+    ROGUE("Schurke", "rogue", 2, 5, 1, 16, 13, Dice.D10, Attribute.DEXTERITY, 0,
             "Schloesser knacken, Fallen entschaerfen, Hinterhalt");
 
     private final String displayName;
@@ -17,11 +17,13 @@ public enum CharacterClass {
     private final int maxHp;
     private final int armorClass;
     private final int damageDie;
+    private final Attribute attackAttribute;
+    private final int spellCharges;
     private final String description;
 
     CharacterClass(String displayName, String artName, int strength, int dexterity,
                    int intelligence, int maxHp, int armorClass, int damageDie,
-                   String description) {
+                   Attribute attackAttribute, int spellCharges, String description) {
         this.displayName = displayName;
         this.artName = artName;
         this.strength = strength;
@@ -30,6 +32,8 @@ public enum CharacterClass {
         this.maxHp = maxHp;
         this.armorClass = armorClass;
         this.damageDie = damageDie;
+        this.attackAttribute = attackAttribute;
+        this.spellCharges = spellCharges;
         this.description = description;
     }
 
@@ -71,6 +75,16 @@ public enum CharacterClass {
 
     public int getDamageDie() {
         return damageDie;
+    }
+
+    /** Mit diesem Attribut wuerfelt die Klasse ihre Treffer (Magier: Intelligenz, Schurke: Geschick). */
+    public Attribute getAttackAttribute() {
+        return attackAttribute;
+    }
+
+    /** Zauberladungen pro Spiel, 0 fuer Klassen ohne Zauber. */
+    public int getSpellCharges() {
+        return spellCharges;
     }
 
     public String getDescription() {
