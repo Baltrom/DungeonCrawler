@@ -25,6 +25,10 @@ public class Player {
         return characterClass;
     }
 
+    public int getAttribute(Attribute attribute) {
+        return characterClass.getAttribute(attribute);
+    }
+
     public int getMaxHp() {
         return maxHp;
     }

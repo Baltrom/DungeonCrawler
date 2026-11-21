@@ -20,6 +20,14 @@ class PlayerTest {
     }
 
     @Test
+    void attributesComeFromTheClass() {
+        Player mage = new Player("Ria", CharacterClass.MAGE);
+        assertEquals(1, mage.getAttribute(Attribute.STRENGTH));
+        assertEquals(2, mage.getAttribute(Attribute.DEXTERITY));
+        assertEquals(5, mage.getAttribute(Attribute.INTELLIGENCE));
+    }
+
+    @Test
     void keepsNameAndClass() {
         Player player = new Player("Ria", CharacterClass.MAGE);
         assertEquals("Ria", player.getName());

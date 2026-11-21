@@ -53,6 +53,14 @@ public enum CharacterClass {
         return intelligence;
     }
 
+    public int getAttribute(Attribute attribute) {
+        return switch (attribute) {
+            case STRENGTH -> strength;
+            case DEXTERITY -> dexterity;
+            case INTELLIGENCE -> intelligence;
+        };
+    }
+
     public int getMaxHp() {
         return maxHp;
     }
