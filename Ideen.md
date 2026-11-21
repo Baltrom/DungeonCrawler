@@ -290,5 +290,7 @@ Rückmeldung nach Version 1:
 - [x] Die fünf Themen unter „Als Nächstes besprechen“ durchgehen
 - [x] Punkte aus „Noch zu klären“ entscheiden
 - [x] Projektgerüst anlegen und Version 1 umsetzen
+- [x] Anzeige umgedreht: Raumname und Beschreibung stehen oben, darunter der Block „Was zuletzt geschah“, dann Status und Auswahl (im Kampf: unter dem Kampf-Kopf)
+- [ ] **TODO Räume mit Charakter füllen:** Mit dem Autor jeden Raum einzeln durchgehen (Raum 0, die acht Vorlagen, Raum 5/Thronsaal) und interessanter machen. Danach die Räume **personalisieren** (jeder Raum bekommt eigene Persönlichkeit, Details, Stellen und Texte). Arbeit in den Dateien `story/rooms/NAME.properties`. Vorgehen: ein Raum pro Schritt, erst besprechen, dann schreiben.
 - [ ] Version 1 selbst durchspielen und die Werte feintunen (Gegner, Schwierigkeit, Items)
 - [ ] Spätere Versionen: mehr Räume, mehr Items und Heiltränke, Endgegner mit Spezialangriffen, Zweitkriterium in der Rangliste (Lebenspunkte/Züge)

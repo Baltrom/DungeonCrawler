@@ -459,12 +459,12 @@ public class Game {
     }
 
     /**
-     * Jedes Menue beginnt mit geleertem Bildschirm. Ganz oben stehen die Ergebnisse der letzten Aktion,
-     * danach der Raum, der Status und die Auswahl.
+     * Jedes Menue beginnt mit geleertem Bildschirm. Zuerst kommt der Raum, danach die Ergebnisse
+     * der letzten Aktion, dann der Status und die Auswahl.
      */
     int chooseAction(String title, List<String> labels, List<String> sceneLines) {
         while (true) {
-            io.clearScreen();
+            io.clearScreenOnly();
             io.println(LINE);
             io.println(header);
             io.println(LINE);
@@ -475,6 +475,7 @@ public class Game {
                 io.println(line);
             }
             io.println();
+            io.showRecentResults();
             for (String line : actions.statusLines()) {
                 io.println(line);
             }

@@ -419,6 +419,22 @@ Zwischen den Punkten wurde die Reihenfolge angepasst (Items vor Räumen, weil R�
 
 ---
 
+## Phase 7: Räume mit Charakter
+
+### Prompt 32
+*(Modellwechsel mit `/model` auf Claude Sonnet 5.5.)*
+> was ich jetzt machen will ist mit dir jeden einzelnen raum durchgehen den wir haben und ihm charackter geben
+> schreib das auch auf unsere TODOs
+> wir machen die räume interessanter,
+>
+> weiters im moment ist es so wenn man sich durch räume beweget oder im raum etwas macht dann kommt oberste zeile " das was gerade passiert ist" und danach noch einmal die intro zum raum in dem man sich befindet, das will ich genau anders rum , das kannst du auch gleich erledigen bitte
+>
+> dann personalisieren wir die räume
+
+**Antwort:** Das TODO „Räume mit Charakter füllen und personalisieren“ steht in `Ideen.md` und `Uebergabe.md`. Die Anzeige ist umgedreht: erst Raum und Beschreibung, darunter „Was zuletzt geschah“, dann Status und Auswahl (`ConsoleIO.clearScreenOnly()` und `showRecentResults()`). Ein Test wurde angepasst, einer ergänzt, 202 Tests grün.
+
+---
+
 ## Rückblick
 
 - **Vorgehen:** Erst alles besprechen und dokumentieren, dann bauen, nach jedem Punkt testen, committen und pushen. Der Autor traf alle Entscheidungen, Claude schlug Lösungen vor, machte auf Lücken aufmerksam und setzte um.

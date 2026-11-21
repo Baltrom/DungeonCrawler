@@ -90,10 +90,11 @@ class Combat {
     private void playerTurn() {
         while (true) {
             // Der Bildschirm wird geleert, ganz oben stehen die Ergebnisse der letzten Zuege
-            io.clearScreen();
+            io.clearScreenOnly();
             io.println(LINE);
             io.println("KAMPF: " + enemy.name());
             io.println(LINE);
+            io.showRecentResults();
             for (String line : actions.statusLines()) {
                 io.println(line);
             }

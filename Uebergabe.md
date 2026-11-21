@@ -146,7 +146,11 @@ Die Werte (Gegner, Falle, Lebenspunkte) stehen in der Datei als Zahlen und müss
 
 ## 9. Wie es weitergeht (offen)
 
-Der Autor will die folgenden Punkte **in der nächsten Sitzung** besprechen:
+**Aktuell (Sitzung nach V1):** Der Autor will **jeden einzelnen Raum mit ihm durchgehen und ihm Charakter geben** (Raum 0, acht Vorlagen, Thronsaal), danach die Räume **personalisieren**. Ein Raum pro Schritt, erst besprechen, dann in `story/rooms/NAME.properties` schreiben. Steht als TODO in `Ideen.md`.
+
+**Schon erledigt in dieser Sitzung:** Die Anzeige ist umgedreht. Jeder Bildschirm zeigt zuerst Raumname und Beschreibung, darunter „Was zuletzt geschah“, dann Status und Auswahl. Technisch: `ConsoleIO.clearScreenOnly()` + `showRecentResults()` (in `Game.chooseAction` und `Combat.playerTurn`); `clearScreen()` zeigt die Ergebnisse weiter direkt nach dem Leeren (Hauptmenü usw.). 202 Tests grün.
+
+Außerdem wollte der Autor **in einer früheren Sitzung** die folgenden Punkte besprechen:
 1. **Feinschliff-Liste** aus seinem Durchspielen (er hat sie noch nicht geschickt).
 2. Ideen für **Version 2**, aus der bisherigen Sammlung:
    - mehr Räume und Raumvorlagen, mehr Items und mehr Heiltränke (in V1 nur einer),

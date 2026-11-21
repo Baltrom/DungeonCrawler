@@ -33,9 +33,19 @@ public class ConsoleIO {
      * die seit dem letzten Leeren mit report() gemeldet wurden, damit man sieht, was passiert ist.
      */
     public void clearScreen() {
+        clearScreenOnly();
+        showRecentResults();
+    }
+
+    /** Leert nur den Bildschirm. Die Ergebnisse zeigt der Aufrufer spaeter selbst mit showRecentResults(). */
+    public void clearScreenOnly() {
         for (int i = 0; i < CLEAR_LINES; i++) {
             out.println();
         }
+    }
+
+    /** Gibt den Block "Was zuletzt geschah" aus (falls es Ergebnisse gibt) und vergisst sie dann. */
+    public void showRecentResults() {
         if (!recentResults.isEmpty()) {
             out.println("--- Was zuletzt geschah ---");
             for (String line : recentResults) {

@@ -21,7 +21,7 @@ Beim Spielen entstehen im Arbeitsordner zwei Dateien: `savegame.txt` (Spielstand
 - Du steuerst alles mit **Zahlen und Enter**. Zu jedem Menü gehören nummerierte Punkte, z. B. `[1] Neues Spiel`. Tippe die Zahl und drücke Enter.
 - Eine ungültige Eingabe wird einfach erneut abgefragt („Bitte eine Zahl von 1 bis 4 eingeben.“).
 - Vor jedem neuen Bildschirm werden viele Leerzeilen ausgegeben, damit der alte Text aus dem Blick verschwindet. Du kannst nach oben scrollen, wenn du etwas nachlesen willst.
-- **Ganz oben auf jedem neuen Bildschirm** steht der Block **„Was zuletzt geschah“**: Würfe, Treffer, Funde und Texte deiner letzten Aktion.
+- Auf jedem neuen Bildschirm steht oben der Raum mit Beschreibung, direkt darunter der Block **„Was zuletzt geschah“**: Würfe, Treffer, Funde und Texte deiner letzten Aktion. Im Kampf steht er unter der Kampf-Überschrift.
 - Es gibt keine Sonderzeichen und keine Umlaute in der Ausgabe (ae, oe, ue), damit die Windows-Konsole nichts verstümmelt.
 
 ## 3. Hauptmenü

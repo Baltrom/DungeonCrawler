@@ -57,6 +57,22 @@ class ConsoleIOTest {
     }
 
     @Test
+    void resultsCanBeShownAfterTheRoomIntro() {
+        ConsoleIO io = io();
+        io.report("Du kommst durch.");
+        io.clearScreenOnly();
+        io.println("RAUM 2");
+        io.showRecentResults();
+
+        String text = printed();
+        int afterBlankLines = text.lastIndexOf("RAUM 2");
+        assertTrue(text.indexOf("--- Was zuletzt geschah ---", afterBlankLines) > afterBlankLines);
+        io.clearScreenOnly();
+        io.showRecentResults();
+        assertEquals(1, count(text.substring(afterBlankLines), "--- Was zuletzt geschah ---"));
+    }
+
+    @Test
     void theResultsAreShownOnlyOnceAfterTheNextClear() {
         ConsoleIO io = io();
         io.report("Treffer");

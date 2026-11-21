@@ -440,7 +440,7 @@ class GameTest {
     // --- Anzeige ---
 
     @Test
-    void theResultOfAnActionIsShownAtTheTopOfTheNextScreen() {
+    void theResultOfAnActionIsShownBelowTheRoomIntroOnTheNextScreen() {
         Player rogue = new Player("Bob", CharacterClass.ROGUE);
         // Gitter absuchen (1, Wurf 20), danach erscheint das Menue neu, dann Tor (3)
         Game game = gameAt(generated, 0, new FixedDice(20), rogue, io("1", "3"));
@@ -449,8 +449,10 @@ class GameTest {
         String text = printed();
         int block = text.lastIndexOf("--- Was zuletzt geschah ---");
         assertTrue(block > 0, "The result block is missing");
-        String lastScreen = text.substring(block);
-        assertTrue(lastScreen.indexOf("Schutzamulett kommt in dein Inventar.") < lastScreen.indexOf("RAUM 0"));
+        // Der Raum steht oben, das Ergebnis darunter
+        assertTrue(text.substring(Math.max(0, block - 600), block).contains("Ein verrostetes Gitter"),
+                "The room intro must come right before the result block");
+        assertTrue(text.indexOf("Schutzamulett kommt in dein Inventar.", block) > block);
     }
 
     @Test
