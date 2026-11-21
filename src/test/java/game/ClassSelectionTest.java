@@ -65,6 +65,25 @@ class ClassSelectionTest {
     }
 
     @Test
+    void classesAreShownSideBySideAndFitIn80Columns() {
+        runWithInput("1", "1", "Ria");
+        String[] lines = printed().split("\\R");
+        boolean sideBySide = false;
+        boolean optionsOnSameLine = false;
+        for (String line : lines) {
+            assertTrue(line.length() <= 80, "Line longer than 80 characters: " + line);
+            if (line.contains("MAGIER") && line.contains("SCHURKE")) {
+                sideBySide = true;
+            }
+            if (line.contains("[1] Magier") && line.contains("[2] Schurke")) {
+                optionsOnSameLine = true;
+            }
+        }
+        assertTrue(sideBySide, "MAGIER and SCHURKE are not on the same line");
+        assertTrue(optionsOnSameLine, "The options [1] and [2] are not on the same line");
+    }
+
+    @Test
     void screenShowsBothClassesWithValuesAndStaysAscii() {
         runWithInput("1", "1", "Ria");
         String text = printed();
