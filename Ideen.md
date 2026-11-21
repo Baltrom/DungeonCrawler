@@ -191,6 +191,8 @@ Rüstungsklasse (RK), Trefferbonus und Schaden der Gegner in der ersten Version 
 - Speichern und Laden ist in der **ersten Version** enthalten.
 - Gespeichert werden **Seed, Raum, Lebenspunkte, Items, Name und Klasse**.
 - Beim Laden wird der alte Spielstand **gelöscht**, damit es kein Savescumming gibt.
+- Gespeichert wird über einen **eigenen Menüpunkt** im Spiel.
+- Bei **Tod oder Sieg** kommt zuerst der **Eintrag in die Rangliste**, danach wird der **Spielstand gelöscht**.
 
 ### Rangliste
 - Gewertet wird die **Anzahl erreichter Räume** (Raum 0 zählt nicht, das Maximum ist in der ersten Version 5).
@@ -246,7 +248,7 @@ Raum 1–4 werden aus dem Seed aus einem Pool von acht Vorlagen gezogen. Jede Vo
 5. ~~Story und Raumvorlagen~~ (erledigt, siehe „Story“ und „Raumvorlagen“)
 
 ### Noch zu klären
-- Wie wird gespeichert: eigener Menüpunkt „Speichern und Beenden“ im Spiel oder automatisch? Was passiert mit dem Spielstand nach Tod oder Sieg?
+Aktuell keine offenen Fragen.
 
 ## Nächste Schritte
 - [x] Eingabesystem entscheiden (nummerierte Auswahl)
@@ -255,4 +257,5 @@ Raum 1–4 werden aus dem Seed aus einem Pool von acht Vorlagen gezogen. Jede Vo
 - [x] Skillcheck-Regeln definieren (D20 + Attribut vs. Schwierigkeit)
 - [x] Umfang der ersten Version festlegen (5 Räume)
 - [x] Die fünf Themen unter „Als Nächstes besprechen“ durchgehen
-- [ ] Punkte aus „Noch zu klären“ entscheiden
+- [x] Punkte aus „Noch zu klären“ entscheiden
+- [ ] Projektgerüst anlegen und mit der Umsetzung beginnen
