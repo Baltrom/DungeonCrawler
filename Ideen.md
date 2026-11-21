@@ -263,6 +263,13 @@ Bei der Umsetzung festgelegt (Details, die oben noch offen waren):
 - **Name:** Keine Umlaute (nur A–Z, a–z, 0–9).
 - **Würfe:** Sind nicht an den Seed gebunden. Beim Laden wird der Dungeon aus dem Seed neu erzeugt, die Würfe fallen neu aus.
 
+## Feinschliff nach dem ersten Durchspielen
+Rückmeldung nach Version 1:
+1. **Ergebnisse sichtbar machen:** Das Ergebnis einer Aktion (Wurf, Weiterkommen, Angriff, Fund) steht im nächsten Textblock, nachdem die 50 Leerzeilen den Bildschirm geleert haben. **Erledigt.**
+2. **Zu schwer, besonders im Kampf:** Gemessen per Simulation (Bot, 60000 Durchläufe je Klasse): Magier gewinnt etwa 25 %, Schurke etwa 60 %. Größte Todesursachen: Patzer bei Weg-Checks (rund 17 % bei beiden), Endgegner (Magier 34 %), Fallenschaden (Magier 19 %). **Vorschlag zur Entscheidung siehe Gespräch, noch nicht umgesetzt.**
+3. **Flavourtext überall:** Jede Interaktion bekommt Text, auch der Übergang in den nächsten Raum (z. B. nach dem Entziffern der Runen am Sarkophag), Angriffe, Funde und Tränke. **Offen.**
+4. **Nicht jeder Raum ist versperrt:** Manche Räume sind frei durchgehbar, haben aber kleine Dinge zu entdecken. Interaktionen lösen Verzweigungen aus (untersuchen, Erkenntnis, weitere Auswahl). Insgesamt mehr Flavour in den Räumen. **Offen, Entwurf wird besprochen.**
+
 ## Nächste Schritte
 - [x] Eingabesystem entscheiden (nummerierte Auswahl)
 - [x] Anzahl Klassen festlegen (2: Magier, Schurke)
