@@ -5,18 +5,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import character.CharacterClass;
 import character.Player;
+import highscore.HighscoreEntry;
+import highscore.Highscores;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class MainMenuTest {
 
+    @TempDir
+    Path dir;
+
     private final ByteArrayOutputStream output = new ByteArrayOutputStream();
     private final List<Player> launchedPlayers = new ArrayList<>();
+
+    private Highscores highscores() {
+        return new Highscores(dir.resolve("highscores.txt"));
+    }
 
     private void runWithInput(GameResult resultOfTheGame, String... lines) {
         String input = String.join("\n", lines) + "\n";
@@ -26,7 +37,7 @@ class MainMenuTest {
         new MainMenu(io, player -> {
             launchedPlayers.add(player);
             return resultOfTheGame;
-        }).run();
+        }, highscores()).run();
     }
 
     private void runWithInput(String... lines) {
@@ -71,12 +82,44 @@ class MainMenuTest {
     }
 
     @Test
-    void loadGameAndHighscoresAreNotAvailableYetAndReturnToTheMenu() {
-        runWithInput("2", "", "3", "", "4");
+    void deathAndVictoryAreWrittenToTheHighscores() {
+        runWithInput(new GameResult(GameOutcome.DEATH, 3), "1", "1", "1", "Ria", "", "4");
+        runWithInput(new GameResult(GameOutcome.VICTORY, 5), "1", "2", "1", "Bob", "", "4");
+        List<HighscoreEntry> entries = highscores().load();
+        assertEquals(2, entries.size());
+        assertEquals(new HighscoreEntry("Bob", CharacterClass.ROGUE, 5), entries.get(0));
+        assertEquals(new HighscoreEntry("Ria", CharacterClass.MAGE, 3), entries.get(1));
+        assertTrue(printed().contains("Platz 1 in der Rangliste!"));
+    }
+
+    @Test
+    void savingAndQuittingDoesNotWriteAnEntry() {
+        runWithInput(new GameResult(GameOutcome.SAVED, 2), "1", "1", "1", "Ria", "", "4");
+        assertTrue(highscores().load().isEmpty());
+        assertTrue(printed().contains("SPIEL GESPEICHERT"));
+    }
+
+    @Test
+    void theHighscoreScreenListsTheEntriesInOrder() {
+        highscores().add(new HighscoreEntry("Bob", CharacterClass.ROGUE, 4));
+        highscores().add(new HighscoreEntry("Ria", CharacterClass.MAGE, 5));
+        runWithInput("3", "", "4");
         String text = printed();
-        assertTrue(text.contains("Spiel laden ist noch nicht verfuegbar."));
-        assertTrue(text.contains("Rangliste ist noch nicht verfuegbar."));
-        assertTrue(text.contains("Auf Wiedersehen!"));
+        assertTrue(text.contains("RANGLISTE - Top 10"));
+        assertTrue(text.indexOf(" 1. Ria (Magier) - 5 Raeume") < text.indexOf(" 2. Bob (Schurke) - 4 Raeume"));
+    }
+
+    @Test
+    void anEmptyHighscoreScreenSaysSo() {
+        runWithInput("3", "", "4");
+        assertTrue(printed().contains("Noch keine Eintraege"));
+    }
+
+    @Test
+    void loadGameIsNotAvailableYetAndReturnsToTheMenu() {
+        runWithInput("2", "", "4");
+        assertTrue(printed().contains("Spiel laden ist noch nicht verfuegbar."));
+        assertTrue(printed().contains("Auf Wiedersehen!"));
     }
 
     @Test
@@ -87,7 +130,8 @@ class MainMenuTest {
 
     @Test
     void outputStaysAscii() {
-        runWithInput("1", "2", "1", "1", "Bob", "", "4");
+        highscores().add(new HighscoreEntry("Bob", CharacterClass.ROGUE, 4));
+        runWithInput("3", "", "1", "2", "1", "1", "Bob", "", "4");
         assertTrue(printed().chars().allMatch(c -> c < 128), "Output contains non-ASCII characters");
     }
 }

@@ -1,6 +1,10 @@
 # Maven-Ausgabe
 target/
 
+# Spieldaten, die beim Spielen entstehen
+highscores.txt
+savegame.txt
+
 # IntelliJ
 .idea/
 *.iml
