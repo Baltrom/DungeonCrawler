@@ -1,7 +1,7 @@
 # Features – Dungeon Crawler
 
-1. **Hauptmenü** (Neues Spiel, Spiel laden, Beenden)
-2. **Klassenauswahl** zu Spielbeginn (z. B. Mage, Rogue) mit Anzeige der Attribute
+1. **Hauptmenü** (Neues Spiel, Spiel laden, Rangliste anzeigen, Beenden)
+2. **Klassenauswahl** zu Spielbeginn (Magier, Schurke) mit ASCII-Figur, Attributen und Lebenspunkten, Bestätigung („Bist du sicher?“) und anschließender Namenseingabe (max. 15 Zeichen)
 3. **Charakterwerte / Attribute** pro Klasse (z. B. Stärke, Geschick, Intelligenz) als Grundlage für Skillchecks
 4. **Storytelling-Ausgabe** (Beschreibung von Räumen und Ereignissen)
 5. **Eingabesystem** (Auswahlmenü a/b/c/d, optional Freitext mit Schlagwort-Erkennung)
@@ -18,5 +18,6 @@
 16. **Mehrere Enden** (Sieg, Tod, Game Over)
 17. **Speichern und Laden** des Spielstands
 18. **Hilfe-Befehl** (Erklärung der Steuerung und Regeln)
+19. **Rangliste (Top 10)** nach Anzahl erreichter Räume, Eintrag bei Tod, Sieg und Beenden, gespeichert in einer Datei
 
 > Offen: Welche Features gehören in die erste Version (MVP), welche kommen später?

@@ -4,7 +4,7 @@
 Textbasierter Dungeon Crawler in Java. Der Spieler wählt eine Klasse (z. B. Mage, Rogue) und erlebt eine Geschichte mit RNG-basierten Skillchecks (D20, D10, D6).
 
 Siehe auch:
-- `Ideen.md` – erste Ideen und offene Fragen
+- `Ideen.md` – erste Ideen, getroffene Entscheidungen und offene Fragen
 - `features.md` – nummerierte Feature-Liste
 
 ## Grundregeln
@@ -13,6 +13,8 @@ Siehe auch:
 - Einfach und lesbar halten, das Projekt ist ein Studienprojekt (Einführung Software Engineering).
 - Nur das umsetzen, was gefragt ist. Keine ungefragten Refactorings oder neuen Abhängigkeiten.
 - Vor größeren Änderungen an der Struktur kurz nachfragen.
+- Konsolenausgabe nur in ASCII (ae/oe/ue statt Umlauten).
+- Bildschirm „leeren“ nur über eine zentrale Methode `clearScreen()`, die viele Leerzeilen ausgibt.
 
 ## Code-Konventionen
 - Klassen in `PascalCase`, Methoden und Variablen in `camelCase`, Konstanten in `UPPER_SNAKE_CASE`.
@@ -34,5 +36,5 @@ Siehe auch:
 
 ## Offene Entscheidungen
 - Eingabesystem: Auswahlmenü (a/b/c/d) oder Freitext mit Schlagwörtern
-- Umfang des Dungeons und Anzahl der Klassen
+- Umfang des Dungeons (Anzahl Klassen ist entschieden: 2, Magier und Schurke)
 - Welche Features gehören in die erste Version (MVP)
