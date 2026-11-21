@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import character.CharacterClass;
-import dungeon.RoomTemplate;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -21,13 +19,6 @@ class StoryTextTest {
     }
 
     @Test
-    void everyRoomTemplateHasADescription() {
-        for (RoomTemplate template : RoomTemplate.values()) {
-            assertAsciiText(template.getTextName());
-        }
-    }
-
-    @Test
     void everyClassHasAnIntro() {
         for (CharacterClass characterClass : CharacterClass.values()) {
             assertAsciiText("intro_" + characterClass.getArtName());
@@ -35,9 +26,9 @@ class StoryTextTest {
     }
 
     @Test
-    void entranceBossRoomAndEndingsHaveTexts() {
-        List<String> names = new ArrayList<>(List.of("room0", "room5", "victory", "death"));
-        names.forEach(this::assertAsciiText);
+    void theEndingsHaveTexts() {
+        assertAsciiText("victory");
+        assertAsciiText("death");
     }
 
     @Test

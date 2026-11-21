@@ -32,48 +32,75 @@ public final class DungeonGenerator {
         do {
             specialRoom = 1 + random.nextInt(RANDOM_ROOMS);
         } while (specialRoom == ordinaryRoom);
-
-        int startHelpTarget = Difficulty.EASY.pickTarget(random);
+        // Raum 1 ist immer frei, dazu Raum 2 oder 3. Raum 4 (vor dem Endgegner) ist immer versperrt.
+        int secondFreeRoom = 2 + random.nextInt(2);
 
         List<Room> rooms = new ArrayList<>();
-        rooms.add(new Room(0, RoomKind.ENTRANCE, null, List.of(), null, EnemyKind.NONE, null, 0));
+        rooms.add(new Room(0, RoomKind.ENTRANCE, null, false, List.of(),
+                createInteractions(RoomScript.load("room0"), 0, random), EnemyKind.NONE, null, 0));
         for (int index = 1; index <= RANDOM_ROOMS; index++) {
             RoomTemplate template = templates.get(index - 1);
+            RoomScript script = template.getScript();
+            boolean blocked = index != 1 && index != secondFreeRoom;
             EnemyKind enemy = index == ordinaryRoom ? EnemyKind.ORDINARY
                     : index == specialRoom ? EnemyKind.SPECIAL : EnemyKind.NONE;
-            rooms.add(new Room(index, RoomKind.NORMAL, template,
-                    createWayOptions(template, index, random),
-                    createLoot(template, index, random),
+            rooms.add(new Room(index, RoomKind.NORMAL, template, blocked,
+                    blocked ? createWayOptions(script, random) : List.of(),
+                    createInteractions(script, index, random),
                     enemy,
                     enemy == EnemyKind.SPECIAL ? pickItem(random) : null,
                     enemy == EnemyKind.NONE ? 0 : Difficulty.MEDIUM.pickTarget(random)));
         }
-        rooms.add(new Room(Dungeon.LAST_ROOM, RoomKind.BOSS, null, List.of(), null,
+        rooms.add(new Room(Dungeon.LAST_ROOM, RoomKind.BOSS, null, false, List.of(), List.of(),
                 EnemyKind.BOSS, null, Difficulty.HARD.pickTarget(random)));
 
-        return new Dungeon(seed, List.copyOf(rooms), startHelpTarget);
+        return new Dungeon(seed, List.copyOf(rooms));
     }
 
-    private static List<WayOption> createWayOptions(RoomTemplate template, int roomIndex, Random random) {
-        Difficulty base = roomIndex == 1 ? Difficulty.EASY : Difficulty.MEDIUM;
+    private static List<WayOption> createWayOptions(RoomScript script, Random random) {
         List<WayOption> options = new ArrayList<>();
-        for (Approach approach : template.getApproaches()) {
-            Difficulty difficulty = approach.harder() ? base.harder() : base;
-            options.add(new WayOption(approach, difficulty, difficulty.pickTarget(random)));
+        for (WayDef way : script.ways()) {
+            Difficulty difficulty = way.harder() ? Difficulty.HARD : Difficulty.MEDIUM;
+            options.add(new WayOption(way, difficulty, difficulty.pickTarget(random)));
         }
         return List.copyOf(options);
     }
 
-    private static LootSpot createLoot(RoomTemplate template, int roomIndex, Random random) {
-        Difficulty difficulty = switch (roomIndex) {
-            case 1 -> Difficulty.EASY;
+    private static List<Interaction> createInteractions(RoomScript script, int roomIndex, Random random) {
+        List<Interaction> interactions = new ArrayList<>();
+        for (InteractionDef def : script.interactions()) {
+            interactions.add(createInteraction(def, roomIndex, random));
+        }
+        return List.copyOf(interactions);
+    }
+
+    private static Interaction createInteraction(InteractionDef def, int roomIndex, Random random) {
+        Difficulty difficulty = null;
+        int target = 0;
+        if (def.attribute() != null) {
+            difficulty = checkDifficulty(roomIndex, def.easier());
+            target = difficulty.pickTarget(random);
+        }
+        Item item = null;
+        if (def.effect() == Effect.ITEM) {
+            if (def.fixedItem() != null) {
+                item = def.fixedItem();
+            } else if (random.nextInt(EMPTY_LOOT_CHANCE) != 0) {
+                item = pickItem(random);
+            }
+        }
+        Interaction follow = def.follow() == null ? null : createInteraction(def.follow(), roomIndex, random);
+        return new Interaction(def, difficulty, target, item, follow);
+    }
+
+    /** Schwierigkeit der Checks beim Untersuchen: Raum 0-1 leicht, Raum 2-3 mittel, Raum 4 schwer. */
+    private static Difficulty checkDifficulty(int roomIndex, boolean easier) {
+        Difficulty base = switch (roomIndex) {
+            case 0, 1 -> Difficulty.EASY;
             case 4 -> Difficulty.HARD;
             default -> Difficulty.MEDIUM;
         };
-        LootAction action = template.getLootAction();
-        boolean empty = random.nextInt(EMPTY_LOOT_CHANCE) == 0;
-        Item item = empty ? null : pickItem(random);
-        return new LootSpot(action.attribute(), action.label(), difficulty, difficulty.pickTarget(random), item);
+        return easier ? base.easier() : base;
     }
 
     /** Waehlt ein Item aus dem Beute-Pool, gewichtet nach Haeufigkeit (der Ring des Lebens ist selten). */

@@ -15,7 +15,7 @@ class CharacterClassTest {
         assertEquals(1, mage.getStrength());
         assertEquals(2, mage.getDexterity());
         assertEquals(5, mage.getIntelligence());
-        assertEquals(12, mage.getMaxHp());
+        assertEquals(14, mage.getMaxHp());
         assertEquals(11, mage.getArmorClass());
         assertEquals(Dice.D6, mage.getDamageDie());
     }

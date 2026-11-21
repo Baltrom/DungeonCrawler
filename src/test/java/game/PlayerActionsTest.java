@@ -36,7 +36,7 @@ class PlayerActionsTest {
         PlayerActions actions = actionsFor(player, "1");
         assertTrue(actions.canDrinkAnything());
         assertTrue(actions.drinkPotion());
-        assertEquals(10, player.getCurrentHp());
+        assertEquals(12, player.getCurrentHp());
         assertFalse(actions.canDrinkAnything());
     }
 
@@ -101,7 +101,7 @@ class PlayerActionsTest {
         mage.addItem(Item.RING_OF_LIFE);
         List<String> lines = actionsFor(mage).statusLines();
         assertTrue(lines.get(0).contains("Ria der Magier"));
-        assertTrue(lines.get(0).contains("HP 15/15"));
+        assertTrue(lines.get(0).contains("HP 17/17"));
         assertTrue(lines.get(0).contains("RK 11"));
         assertTrue(lines.get(0).contains("Ladungen 3/3"));
         assertTrue(lines.get(1).contains("Inventar (1/5): Ring des Lebens"));

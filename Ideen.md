@@ -44,7 +44,7 @@ Entschieden: Es bleibt bei **2 Klassen** (Magier und Schurke).
 - Eine **1** ist immer ein Fehlschlag, eine **20** immer ein Erfolg.
 - Das **Wurfergebnis wird immer angezeigt**.
 - Skillchecks sind **nicht wiederholbar**. Bei einem Fehlschlag passiert nichts, oder eine Falle löst aus und verursacht Schaden.
-- Kein Check darf den Weg einfach blockieren (kein Festhängen im Spiel). Ist ein Check nötig, um in den nächsten Raum zu kommen, ist er eine **Falle, bei deren Fehlschlag der Charakter sterben kann**.
+- Kein Check darf den Weg einfach blockieren (kein Festhängen im Spiel). Ist ein Check nötig, um in den nächsten Raum zu kommen, ist er eine **Falle** (Schaden bei Fehlschlag, nach dem Feinschliff nicht mehr tödlich, siehe „Feinschliff“).
 - Schwierigkeitswerte:
 
 | Stufe  | Zielwert |
@@ -64,9 +64,10 @@ Es gibt vier Arten von Checks:
 | **Wissens-Check** | Runen lesen, Hinweise finden (Intelligenz) | Man erfährt nichts, sonst keine Strafe |
 
 - **Weg-Checks** bieten **2–3 Ansätze** mit unterschiedlichen Attributen und Schwierigkeiten, z. B. bei einer Tür: Schloss knacken (Geschick, mittel), Aufbrechen (Stärke, schwer), Runen entziffern (Intelligenz, mittel). Der Spieler wählt den Ansatz.
-- **Falle bei Weg-Checks:**
-  - Normaler Fehlschlag: **2×D6 Schaden**.
-  - Eine **1 (Patzer)**: die Falle ist **tödlich**.
+- **Falle bei Weg-Checks** (nach dem Feinschliff):
+  - Normaler Fehlschlag: **1W6 Schaden**.
+  - Eine **1 (Patzer)**: **2W6 Schaden** (vorher tödlich).
+  - Kleine Fallen beim Untersuchen (z. B. ein umstürzendes Regal): bei Fehlschlag **1W4 Schaden**.
 - **Schwierigkeit nach Raum:**
 
 | Raum | Weg-Check | Beute-Check |
@@ -85,11 +86,11 @@ Es gibt vier Arten von Checks:
 | Stärke       | 1      | 2       |
 | Geschick     | 2      | 5       |
 | Intelligenz  | 5      | 1       |
-| Lebenspunkte | 12     | 16      |
+| Lebenspunkte | 14     | 16      |
 
 ### Lebenspunkte
 - Maximal **20 Lebenspunkte**.
-- Start: **Magier 12**, **Schurke 16**.
+- Start: **Magier 14** (vorher 12), **Schurke 16**.
 - Ein seltenes Item (vielleicht ein Ring) erhöht die maximalen Lebenspunkte **dauerhaft um 3** und **hebt damit die Obergrenze von 20 an**.
 - Heilen nur über **Tränke**. Einen Trank kann man in **jedem Auswahlmenü** trinken.
 - Ein Heiltrank heilt **immer 6 Lebenspunkte**.
@@ -172,9 +173,11 @@ Rüstungsklasse (RK), Trefferbonus und Schaden der Gegner in der ersten Version 
 
 | Typ | Lebenspunkte | RK | Trefferbonus | Schaden | Beute |
 |-----|--------------|----|--------------|---------|-------|
-| Gewöhnlicher Gegner | 8 | 10 | +2 | D6 | Beute-Check am Leichnam |
-| Besonderer Gegner (freiwillig) | 12 | 12 | +3 | D6 | immer ein Item |
-| Endgegner | 20 | 13 | +3 | D6 | keine, das Spiel endet |
+| Gewöhnlicher Gegner (Skelett) | 6 | 9 | +1 | D6 | Beute-Check am Leichnam |
+| Besonderer Gegner (Gargoyle, freiwillig) | 10 | 11 | +2 | D6 | immer ein Item |
+| Endgegner (Der tote König) | 18 | 13 | +2 | D6 | keine, das Spiel endet |
+
+(Werte nach dem Feinschliff, vorher: Skelett 8/10/+2, Gargoyle 12/12/+3, Endgegner 20/13/+3.)
 
 - Ein Gegner trifft, wenn **D20 + Trefferbonus** die Rüstungsklasse des Spielers erreicht. Gegner greifen jede Runde an, ohne Taktik.
 - **Besonderer Gegner:** z. B. eine **Statue oder ein Gargoyle**, die der Spieler durch **Untersuchen oder einen Skillcheck „aktiviert“**. Erst dann beginnt der Kampf. Man kann ihn also umgehen.
@@ -266,9 +269,17 @@ Bei der Umsetzung festgelegt (Details, die oben noch offen waren):
 ## Feinschliff nach dem ersten Durchspielen
 Rückmeldung nach Version 1:
 1. **Ergebnisse sichtbar machen:** Das Ergebnis einer Aktion (Wurf, Weiterkommen, Angriff, Fund) steht im nächsten Textblock, nachdem die 50 Leerzeilen den Bildschirm geleert haben. **Erledigt.**
-2. **Zu schwer, besonders im Kampf:** Gemessen per Simulation (Bot, 60000 Durchläufe je Klasse): Magier gewinnt etwa 25 %, Schurke etwa 60 %. Größte Todesursachen: Patzer bei Weg-Checks (rund 17 % bei beiden), Endgegner (Magier 34 %), Fallenschaden (Magier 19 %). **Vorschlag zur Entscheidung siehe Gespräch, noch nicht umgesetzt.**
-3. **Flavourtext überall:** Jede Interaktion bekommt Text, auch der Übergang in den nächsten Raum (z. B. nach dem Entziffern der Runen am Sarkophag), Angriffe, Funde und Tränke. **Offen.**
-4. **Nicht jeder Raum ist versperrt:** Manche Räume sind frei durchgehbar, haben aber kleine Dinge zu entdecken. Interaktionen lösen Verzweigungen aus (untersuchen, Erkenntnis, weitere Auswahl). Insgesamt mehr Flavour in den Räumen. **Offen, Entwurf wird besprochen.**
+2. **Zu schwer, besonders im Kampf:** Gemessen per Simulation (Bot, 60000 Durchläufe je Klasse): Vorher gewann der Magier etwa 25 %, der Schurke etwa 60 %. Größte Todesursachen waren der tödliche Patzer bei Weg-Checks (rund 17 % bei beiden), der Endgegner (Magier 34 %) und der Fallenschaden (Magier 19 %). **Umgesetzt (Variante „P4“):** Fallenschaden 1W6, Patzer 2W6 statt tödlich, schwächere Gegner (siehe Tabelle bei „Gegner“), Magier mit 14 Lebenspunkten. Danach (mit den freien Räumen) im Bot-Test: Magier etwa 60–70 %, Schurke etwa 90 %.
+3. **Flavourtext überall:** Jede Interaktion, jeder Erfolg und Fehlschlag, jeder Übergang in den nächsten Raum, jeder Fund, jeder Trank und jeder Angriff hat Text (1–2 Sätze, düster). **Erledigt.**
+4. **Nicht jeder Raum ist versperrt:** Siehe „Raumgestaltung nach dem Feinschliff“. **Erledigt.**
+
+### Raumgestaltung nach dem Feinschliff
+- **Freie und versperrte Räume:** Raum 1 ist immer frei, dazu Raum 2 oder 3 (zufällig), Raum 4 (vor dem Endgegner) ist immer versperrt. In freien Räumen gibt es einen Menüpunkt „Weitergehen“ mit Text, ohne Check.
+- **Versperrte Räume:** Zuerst „Das Hindernis untersuchen“ (ohne Wurf, nur Text). Danach erscheinen die zwei Ansätze mit Attribut und Schwierigkeit.
+- **Dinge zum Untersuchen:** Jede Raumvorlage hat 3 Stellen, jede nur einmal. Pro Raum genau eine mit Item (10 % leer), dazu Stimmung, Hinweise und Erkenntnisse. Manche haben bei Fehlschlag eine kleine Falle (1W4).
+- **Verzweigungen:** Eine Stelle kann eine Folge-Interaktion freischalten („Die Kratzspuren genauer ansehen“). Diese erscheint erst nach der ersten und wird nur einmal gemacht.
+- **Wirkungen einer gelungenen Interaktion:** Item, **Hinweis** (verrät, was im nächsten Raum wartet: Gegner, Statue, Endgegner, Raumname und ob der Durchgang versperrt ist), **Erkenntnis** (+2 auf den nächsten Check in diesem Raum) oder nur Stimmung.
+- **Texte:** Pro Raumvorlage eine Datei `src/main/resources/story/rooms/NAME.properties` (Beschreibung mit 4 Zeilen, Hindernis, Ansätze, Stellen), allgemeine Texte (Kampf, Funde, Fallen, Hinweise) in `story/flavour.properties` mit mehreren Varianten, die zufällig gewählt werden.
 
 ## Nächste Schritte
 - [x] Eingabesystem entscheiden (nummerierte Auswahl)

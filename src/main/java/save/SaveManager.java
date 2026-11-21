@@ -35,9 +35,11 @@ public class SaveManager {
         lines.add("hp=" + save.currentHp());
         lines.add("charges=" + save.spellCharges());
         lines.add("items=" + String.join(",", save.items().stream().map(Item::name).toList()));
-        lines.add("lootTried=" + save.lootTried());
+        lines.add("done=" + String.join(",", save.doneInteractions()));
+        lines.add("obstacleExamined=" + save.obstacleExamined());
         lines.add("specialDone=" + save.specialDone());
         lines.add("ordinaryDefeated=" + save.ordinaryDefeated());
+        lines.add("insight=" + save.insightBonus());
         lines.add("arcaneSight=" + save.arcaneSight());
         try {
             Files.write(file, lines, StandardCharsets.UTF_8);
@@ -89,6 +91,11 @@ public class SaveManager {
                 items.add(Item.valueOf(itemName));
             }
         }
+        List<String> done = new ArrayList<>();
+        String doneText = value(values, "done");
+        if (!doneText.isEmpty()) {
+            done.addAll(List.of(doneText.split(",")));
+        }
         return new SaveGame(
                 Long.parseLong(value(values, "seed")),
                 value(values, "name"),
@@ -97,9 +104,11 @@ public class SaveManager {
                 Integer.parseInt(value(values, "hp")),
                 Integer.parseInt(value(values, "charges")),
                 items,
-                bool(values, "lootTried"),
+                done,
+                bool(values, "obstacleExamined"),
                 bool(values, "specialDone"),
                 bool(values, "ordinaryDefeated"),
+                Integer.parseInt(value(values, "insight")),
                 bool(values, "arcaneSight"));
     }
 

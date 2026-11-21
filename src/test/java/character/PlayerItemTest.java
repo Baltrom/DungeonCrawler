@@ -43,8 +43,8 @@ class PlayerItemTest {
         Player mage = new Player("Ria", CharacterClass.MAGE);
         mage.takeDamage(7);
         mage.addItem(Item.RING_OF_LIFE);
-        assertEquals(15, mage.getMaxHp());
-        assertEquals(8, mage.getCurrentHp());
+        assertEquals(17, mage.getMaxHp());
+        assertEquals(10, mage.getCurrentHp());
     }
 
     @Test
@@ -52,8 +52,8 @@ class PlayerItemTest {
         Player mage = new Player("Ria", CharacterClass.MAGE);
         mage.addItem(Item.RING_OF_LIFE);
         mage.removeItem(Item.RING_OF_LIFE);
-        assertEquals(12, mage.getMaxHp());
-        assertEquals(12, mage.getCurrentHp());
+        assertEquals(14, mage.getMaxHp());
+        assertEquals(14, mage.getCurrentHp());
         assertFalse(mage.hasItem(Item.RING_OF_LIFE));
     }
 
@@ -85,7 +85,7 @@ class PlayerItemTest {
         player.takeDamage(8);
         player.addItem(Item.HEALING_POTION);
         player.drink(Item.HEALING_POTION);
-        assertEquals(10, player.getCurrentHp());
+        assertEquals(12, player.getCurrentHp());
         assertFalse(player.hasItem(Item.HEALING_POTION));
     }
 

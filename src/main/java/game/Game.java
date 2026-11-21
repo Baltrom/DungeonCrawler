@@ -12,9 +12,11 @@ import dice.Dice;
 import dungeon.Dungeon;
 import dungeon.DungeonGenerator;
 import dungeon.EnemyKind;
-import dungeon.LootSpot;
+import dungeon.Interaction;
+import dungeon.InteractionDef;
 import dungeon.Room;
 import dungeon.RoomKind;
+import dungeon.RoomScript;
 import dungeon.WayOption;
 import item.Inventory;
 import item.Item;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import save.SaveGame;
 import save.SaveManager;
+import story.Flavour;
 import story.StoryText;
 
 /** Ein laufendes Spiel: fuehrt den Spieler Raum fuer Raum durch den Dungeon. */
@@ -36,12 +39,15 @@ public class Game {
     }
 
     private static final String LINE = "==================================================";
+    private static final int INSIGHT_BONUS = 2;
+    private static final int INTERACTION_TRAP_DIE = 4;
 
     private final ConsoleIO io;
     private final Dice dice;
     private final Player player;
     private final Dungeon dungeon;
     private final PlayerActions actions;
+    private final Flavour flavour;
     private final boolean showIntro;
     private final SaveManager saveManager;
     private int roomIndex;
@@ -59,7 +65,8 @@ public class Game {
     /** Spielstand laden: der Dungeon wird aus dem gespeicherten Seed neu erzeugt, es gibt keine Einleitung mehr. */
     static Game fromSave(ConsoleIO io, Dice dice, SaveGame save, SaveManager saveManager) {
         return new Game(io, dice, save.toPlayer(), DungeonGenerator.generate(save.seed()), save.roomIndex(),
-                new RoomProgress(save.lootTried(), save.specialDone(), save.ordinaryDefeated()),
+                new RoomProgress(java.util.Set.copyOf(save.doneInteractions()), save.obstacleExamined(),
+                        save.specialDone(), save.ordinaryDefeated(), save.insightBonus()),
                 save.arcaneSight(), false, saveManager);
     }
 
@@ -70,7 +77,8 @@ public class Game {
         this.player = player;
         this.dungeon = dungeon;
         this.saveManager = saveManager;
-        this.actions = new PlayerActions(io, player);
+        this.flavour = new Flavour();
+        this.actions = new PlayerActions(io, player, flavour);
         this.roomIndex = roomIndex;
         this.roomsReached = roomIndex;
         this.progress = progress;
@@ -102,8 +110,6 @@ public class Game {
         }
     }
 
-    // --- Raeume ---
-
     private void showIntro() {
         io.clearScreen();
         io.println(LINE);
@@ -114,69 +120,50 @@ public class Game {
         io.readLine("Weiter mit Enter...");
     }
 
+    // --- Raeume ---
+
     RoomResult playRoom() {
         Room room = dungeon.room(roomIndex);
         roomsReached = Math.max(roomsReached, roomIndex);
-        showRoom(room);
+        RoomScript script = room.script();
+        header = "RAUM " + room.index() + " - " + script.name();
+        description = script.description();
+
         if (room.kind() == RoomKind.BOSS) {
-            return playBossRoom(room);
+            return playBossRoom(room, script);
         }
         if (room.enemy() == EnemyKind.ORDINARY && !progress.ordinaryDefeated) {
-            if (!encounter(Enemy.skeleton(), room.encounterTarget(), Difficulty.MEDIUM)) {
+            if (!encounter(Enemy.skeleton(), room.encounterTarget(), Difficulty.MEDIUM, "ordinary")) {
                 return RoomResult.DEAD;
             }
             progress.ordinaryDefeated = true;
         }
-        return roomMenu(room);
+        return roomMenu(room, script);
     }
 
-    private void showRoom(Room room) {
-        String title;
-        String textName;
-        switch (room.kind()) {
-            case ENTRANCE -> {
-                title = "RAUM 0 - Vor dem Tor";
-                textName = "room0";
-            }
-            case BOSS -> {
-                title = "RAUM " + room.index() + " - Der Thronsaal";
-                textName = "room5";
-            }
-            default -> {
-                title = "RAUM " + room.index() + " - " + room.template().getDisplayName();
-                textName = room.template().getTextName();
-            }
-        }
-        // Angezeigt wird beides bei jedem Menue dieses Raums, nachdem der Bildschirm geleert wurde
-        header = title;
-        description = StoryText.load(textName);
-    }
-
-    private RoomResult roomMenu(Room room) {
+    private RoomResult roomMenu(Room room, RoomScript script) {
         while (true) {
             List<String> labels = new ArrayList<>();
             List<Supplier<RoomResult>> handlers = new ArrayList<>();
 
-            LootSpot loot = lootOf(room);
-            if (loot != null && !progress.lootTried) {
-                labels.add(loot.label() + " (" + describe(loot.attribute(), loot.difficulty()) + ")");
-                handlers.add(() -> {
-                    tryLoot(loot);
-                    return null;
-                });
+            for (Interaction interaction : availableInteractions(room)) {
+                labels.add(labelOf(interaction));
+                handlers.add(() -> interact(interaction, room));
             }
             if (room.enemy() == EnemyKind.SPECIAL && !progress.specialDone) {
-                labels.add("Die Gargoyle-Statue untersuchen (" + describe(Attribute.INTELLIGENCE,
+                labels.add(flavour.pick("statue.label") + " (" + describe(Attribute.INTELLIGENCE,
                         Difficulty.MEDIUM) + ")");
                 handlers.add(() -> examineStatue(room));
             }
-            if (room.kind() == RoomKind.ENTRANCE) {
-                labels.add("Das Gitter aufstossen und die Gruft betreten");
-                handlers.add(() -> RoomResult.NEXT);
+            if (!room.blocked()) {
+                labels.add(script.freeLabel());
+                handlers.add(() -> walkOn(script));
+            } else if (!progress.obstacleExamined) {
+                labels.add(script.obstacleLabel());
+                handlers.add(() -> examineObstacle(script));
             } else {
                 for (WayOption way : room.wayOptions()) {
-                    labels.add(way.approach().label() + " ("
-                            + describe(way.approach().attribute(), way.difficulty()) + ")");
+                    labels.add(way.def().label() + " (" + describe(way.def().attribute(), way.difficulty()) + ")");
                     handlers.add(() -> attemptWay(way));
                 }
                 if (player.hasItem(Item.IRON_KEY)) {
@@ -195,28 +182,126 @@ public class Game {
         }
     }
 
-    private LootSpot lootOf(Room room) {
-        return switch (room.kind()) {
-            case ENTRANCE -> dungeon.startHelp(player.getCharacterClass());
-            case NORMAL -> room.loot();
-            case BOSS -> null;
-        };
+    /** Die Interaktionen, die man gerade waehlen kann. Eine Folge-Interaktion erscheint nach ihrer Vorgaengerin. */
+    List<Interaction> availableInteractions(Room room) {
+        List<Interaction> available = new ArrayList<>();
+        for (Interaction interaction : room.interactions()) {
+            if (!appliesToPlayer(interaction.def())) {
+                continue;
+            }
+            if (!progress.done.contains(interaction.id())) {
+                available.add(interaction);
+            } else if (interaction.follow() != null && !progress.done.contains(interaction.follow().id())) {
+                available.add(interaction.follow());
+            }
+        }
+        return available;
+    }
+
+    private boolean appliesToPlayer(InteractionDef def) {
+        return def.onlyFor() == null || def.onlyFor() == player.getCharacterClass();
+    }
+
+    private String labelOf(Interaction interaction) {
+        InteractionDef def = interaction.def();
+        if (def.attribute() == null) {
+            return def.label();
+        }
+        return def.label() + " (" + describe(def.attribute(), interaction.difficulty()) + ")";
     }
 
     private String describe(Attribute attribute, Difficulty difficulty) {
         return attribute.getDisplayName() + ", " + difficulty.getDisplayName();
     }
 
-    private RoomResult playBossRoom(Room room) {
-        io.report("Am Eingang der Halle steht ein kleiner Trank, als haette ihn jemand fuer dich bereitgestellt.");
+    private RoomResult playBossRoom(Room room, RoomScript script) {
+        io.report(script.extra().get("potion.text"));
         receiveItem(Item.HEALING_POTION);
-        boolean won = encounter(Enemy.deadKing(), room.encounterTarget(), Difficulty.HARD);
+        boolean won = encounter(Enemy.deadKing(), room.encounterTarget(), Difficulty.HARD, "boss");
         return won ? RoomResult.WON : RoomResult.DEAD;
     }
 
-    // --- Checks, Beute und Fallen ---
+    // --- Untersuchen, Erkenntnis und Hinweise ---
 
-    /** Wuerfelt einen Check. Arkane Sicht gibt einmalig +3 auf einen Intelligenz-Check. */
+    /** Untersuchen, durchsuchen, oeffnen: Stimmung immer, dann ggf. ein Check mit Erfolg oder Fehlschlag. */
+    RoomResult interact(Interaction interaction, Room room) {
+        InteractionDef def = interaction.def();
+        progress.done.add(def.id());
+        io.report(def.text());
+
+        if (def.attribute() == null) {
+            if (def.successText() != null) {
+                io.report(def.successText());
+            }
+            applyEffect(interaction, room);
+            return null;
+        }
+        CheckResult result = check(def.attribute(), interaction.target());
+        if (result.success()) {
+            io.report(def.successText());
+            applyEffect(interaction, room);
+            return null;
+        }
+        io.report(def.failureText());
+        if (def.failureDamage()) {
+            int damage = dice.roll(INTERACTION_TRAP_DIE);
+            player.takeDamage(damage);
+            io.report("Du nimmst " + damage + " Schaden (1W" + INTERACTION_TRAP_DIE + ").");
+            if (!player.isAlive()) {
+                io.report(flavour.pick("trap.dead"));
+                return RoomResult.DEAD;
+            }
+        }
+        return null;
+    }
+
+    private void applyEffect(Interaction interaction, Room room) {
+        switch (interaction.def().effect()) {
+            case ITEM -> {
+                if (interaction.item() == null) {
+                    io.report(flavour.pick("loot.empty"));
+                } else {
+                    receiveItem(interaction.item());
+                }
+            }
+            case HINT -> io.report(hintAbout(room));
+            case INSIGHT -> {
+                progress.insightBonus = INSIGHT_BONUS;
+                io.report("Erkenntnis: Dein naechster Check in diesem Raum bekommt +" + INSIGHT_BONUS + ".");
+            }
+            case NONE -> {
+            }
+        }
+    }
+
+    /** Ein Hinweis auf den naechsten Raum: was dort wartet und ob der Durchgang versperrt ist. */
+    String hintAbout(Room room) {
+        Room next = dungeon.room(room.index() + 1);
+        if (next.kind() == RoomKind.BOSS) {
+            return flavour.pick("hint.boss");
+        }
+        String content = switch (next.enemy()) {
+            case ORDINARY -> flavour.pick("hint.ordinary");
+            case SPECIAL -> flavour.pick("hint.special");
+            default -> flavour.pick("hint.room", "{room}", next.script().name());
+        };
+        return content + " " + flavour.pick(next.blocked() ? "hint.blocked" : "hint.free");
+    }
+
+    private RoomResult examineObstacle(RoomScript script) {
+        progress.obstacleExamined = true;
+        io.report(script.obstacleText());
+        return null;
+    }
+
+    private RoomResult walkOn(RoomScript script) {
+        io.report(script.freeText());
+        return RoomResult.NEXT;
+    }
+
+    // --- Checks, Funde und Fallen ---
+
+    /** Wuerfelt einen Check. Arkane Sicht und Erkenntnis geben einmalig einen Bonus. */
     CheckResult check(Attribute attribute, int target) {
         int bonus = player.getAttribute(attribute);
         String label = attribute.getDisplayName();
@@ -225,27 +310,19 @@ public class Game {
             label += " + Arkane Sicht";
             arcaneSight = false;
         }
+        if (progress.insightBonus > 0) {
+            bonus += progress.insightBonus;
+            label += " + Erkenntnis";
+            progress.insightBonus = 0;
+        }
         CheckResult result = SkillCheck.roll(dice, bonus, target);
         io.report(result.describe(label));
         return result;
     }
 
-    void tryLoot(LootSpot spot) {
-        progress.lootTried = true;
-        CheckResult result = check(spot.attribute(), spot.target());
-        if (!result.success()) {
-            io.report("Es gelingt dir nicht. Zum Glueck passiert nichts.");
-            return;
-        }
-        if (spot.item() == null) {
-            io.report("Das Versteck ist leer. Jemand war vor dir hier.");
-            return;
-        }
-        receiveItem(spot.item());
-    }
-
     /** Nimmt ein Item auf. Ist das Inventar voll, entscheidet der Spieler, was weg soll. */
     void receiveItem(Item item) {
+        io.report(flavour.pick("item.found." + item.name()));
         io.report("Du findest: " + item.getDisplayName() + " (" + item.getDescription() + ")");
         if (player.addItem(item)) {
             io.report(item.getDisplayName() + " kommt in dein Inventar.");
@@ -271,36 +348,36 @@ public class Game {
     }
 
     RoomResult attemptWay(WayOption way) {
-        CheckResult result = check(way.approach().attribute(), way.target());
+        CheckResult result = check(way.def().attribute(), way.target());
         if (result.success()) {
-            io.report("Du kommst durch.");
+            io.report(way.def().successText());
             return RoomResult.NEXT;
         }
+        io.report(way.def().failureText());
         return triggerTrap(result.isNaturalOne());
     }
 
-    /** Eine Falle: bei einem Patzer (1) toedlich, sonst 2xD6 Schaden. */
-    RoomResult triggerTrap(boolean deadly) {
-        io.report("Eine Falle schnappt zu!");
-        if (deadly) {
-            io.report("Du bist voellig unvorbereitet. Die Falle ist toedlich.");
-            player.takeDamage(player.getCurrentHp());
-            return RoomResult.DEAD;
+    /** Eine Falle: 1W6 Schaden, bei einem Patzer (1) doppelt so viel (2W6). */
+    RoomResult triggerTrap(boolean fumble) {
+        int diceCount = fumble ? 2 : 1;
+        int damage = 0;
+        for (int i = 0; i < diceCount; i++) {
+            damage += dice.rollD6();
         }
-        int damage = dice.rollD6() + dice.rollD6();
         player.takeDamage(damage);
-        io.report("Du nimmst " + damage + " Schaden (2xD6).");
+        io.report(flavour.pick(fumble ? "trap.fumble" : "trap.hit"));
+        io.report("Du nimmst " + damage + " Schaden (" + diceCount + "W6).");
         if (!player.isAlive()) {
-            io.report("Die Verletzungen sind zu schwer.");
+            io.report(flavour.pick("trap.dead"));
             return RoomResult.DEAD;
         }
-        io.report("Verletzt kaempfst du dich weiter.");
+        io.report(flavour.pick("trap.survive"));
         return RoomResult.NEXT;
     }
 
     RoomResult useKey() {
         player.removeItem(Item.IRON_KEY);
-        io.report("Der Schluessel dreht sich knirschend im Schloss und zerbricht.");
+        io.report(flavour.pick("key.use"));
         return RoomResult.NEXT;
     }
 
@@ -308,31 +385,33 @@ public class Game {
 
     private RoomResult examineStatue(Room room) {
         progress.specialDone = true;
+        io.report(flavour.pick("statue.look"));
         CheckResult result = check(Attribute.INTELLIGENCE, room.encounterTarget());
         boolean playerFirst;
         if (result.success()) {
-            io.report("Du erkennst die Zeichen auf dem Sockel und weisst, wann die Statue erwacht.");
+            io.report(flavour.pick("statue.success"));
             playerFirst = true;
         } else {
-            io.report("Die Statue erwacht, kaum dass du sie beruehrst!");
+            io.report(flavour.pick("statue.fail"));
             playerFirst = coinToss();
         }
         if (!fight(Enemy.gargoyle(), playerFirst, false)) {
             return RoomResult.DEAD;
         }
-        io.report("Die Gargoyle zerfaellt zu Geroell.");
+        io.report(flavour.pick("statue.defeated"));
         receiveItem(room.enemyItem());
         return null;
     }
 
     /** Begegnung mit einem Gegner: Schleichen oder Spaehen verschaffen den ersten Zug, sonst Muenzwurf. */
-    private boolean encounter(Enemy enemy, int target, Difficulty difficulty) {
+    private boolean encounter(Enemy enemy, int target, Difficulty difficulty, String kind) {
         String level = difficulty.getDisplayName();
         List<String> labels = List.of(
                 "Schleichen (Geschick, " + level + ")",
                 "Spaehen (Intelligenz, " + level + ")",
                 "Sofort angreifen (Muenzwurf entscheidet, wer beginnt)");
-        int choice = chooseAction("Wie gehst du vor?", labels, List.of("Ein Gegner: " + enemy.name() + "!"));
+        String scene = flavour.pick("encounter." + kind, "{enemy}", enemy.name());
+        int choice = chooseAction("Wie gehst du vor?", labels, List.of("", scene));
 
         boolean playerFirst;
         boolean ambush = false;
@@ -345,12 +424,17 @@ public class Game {
                 playerFirst = true;
                 if (sneaking && player.getCharacterClass() == CharacterClass.ROGUE) {
                     ambush = true;
-                    io.report("Du schleichst dich von hinten an. Dein erster Treffer wird doppelten Schaden machen.");
+                    io.report(flavour.pick("encounter.sneak.rogue"));
+                    io.report("Dein erster Treffer macht doppelten Schaden.");
+                } else if (sneaking) {
+                    io.report(flavour.pick("encounter.sneak.other"));
+                    io.report("Du gewinnst den ersten Zug.");
                 } else {
-                    io.report("Unbemerkt gewinnst du den ersten Zug.");
+                    io.report(flavour.pick("encounter.spy"));
+                    io.report("Du gewinnst den ersten Zug.");
                 }
             } else {
-                io.report("Du wirst bemerkt.");
+                io.report(flavour.pick("encounter.noticed"));
                 playerFirst = coinToss();
             }
         }
@@ -364,7 +448,7 @@ public class Game {
     }
 
     boolean fight(Enemy enemy, boolean playerFirst, boolean ambush) {
-        return new Combat(io, dice, player, enemy, actions).run(playerFirst, ambush);
+        return new Combat(io, dice, player, enemy, actions, flavour).run(playerFirst, ambush);
     }
 
     // --- Menue mit Trank und Zauber ---
@@ -396,6 +480,9 @@ public class Game {
             }
             if (arcaneSight) {
                 io.println("Arkane Sicht ist aktiv (+3 auf deinen naechsten Intelligenz-Check).");
+            }
+            if (progress.insightBonus > 0) {
+                io.println("Erkenntnis ist aktiv (+" + progress.insightBonus + " auf deinen naechsten Check).");
             }
             io.println();
             io.println(title);
@@ -433,8 +520,8 @@ public class Game {
         Spell spell = actions.chooseSpell(false);
         if (spell == Spell.ARCANE_SIGHT) {
             arcaneSight = true;
-            io.report("Die Runen leuchten auf. Dein naechster Intelligenz-Check bekommt +"
-                    + Spell.ARCANE_SIGHT_BONUS + ".");
+            io.report(flavour.pick("spell.arcane"));
+            io.report("Dein naechster Intelligenz-Check bekommt +" + Spell.ARCANE_SIGHT_BONUS + ".");
         }
     }
 
@@ -449,7 +536,8 @@ public class Game {
     SaveGame snapshot() {
         return new SaveGame(dungeon.seed(), player.getName(), player.getCharacterClass(), roomIndex,
                 player.getCurrentHp(), player.getSpellCharges(), player.getItems(),
-                progress.lootTried, progress.specialDone, progress.ordinaryDefeated, arcaneSight);
+                List.copyOf(progress.done), progress.obstacleExamined, progress.specialDone,
+                progress.ordinaryDefeated, progress.insightBonus, arcaneSight);
     }
 
     // --- Zugriff fuer Tests ---

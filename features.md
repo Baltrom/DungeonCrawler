@@ -14,11 +14,12 @@
 12. **Gegner** mit eigenen Werten (Lebenspunkte, Rüstungsklasse, Trefferbonus, Schaden): gewöhnlicher Gegner, besonderer Gegner (z. B. Statue oder Gargoyle, wird durch Untersuchen aktiviert, freiwilliger Kampf), **Endgegner** (in Version 1 nur zäher); Magier hat Rüstungsklasse 11, Schurke 13
 13. **Inventar** (5 Plätze, passive Wirkung, kein Anlegen; Tränke und Schlüssel zählen mit, bei vollem Inventar wählt der Spieler, was wegfällt; ein abgeworfenes Item ist endgültig weg)
 14. **Gegenstände und Loot** (Tränke, Ringe und andere passive Items, Magischer Dolch, Schlüssel; Beute-Checks mit kleiner Chance auf kein Item; besondere Gegner geben immer ein Item; Heiltrank heilt 6 Lebenspunkte)
-15. **Fallen und Rätsel** (Weg-Checks mit 2–3 wählbaren Ansätzen; bei Fehlschlag 2×D6 Schaden, bei einer 1 tödlich; Beute-Checks meist folgenlos; Schwierigkeit steigt mit der Raumnummer; nichts blockiert den Weg dauerhaft)
+15. **Fallen und Rätsel** (Weg-Checks mit 2 wählbaren Ansätzen in versperrten Räumen; bei Fehlschlag 1W6 Schaden, bei einer 1 2W6; Untersuchen mit kleiner Falle 1W4; Schwierigkeit steigt mit der Raumnummer; nichts blockiert den Weg dauerhaft)
 16. **Mehrere Enden** (Sieg, Tod, Game Over)
 17. **Speichern und Laden** des Spielstands (Seed, Raum, Lebenspunkte, Items, Name, Klasse; beim Laden wird der alte Spielstand gelöscht)
 18. **Hilfe-Befehl** (Erklärung der Steuerung und Regeln)
 19. **Rangliste (Top 10)** nach Anzahl erreichter Räume, bei Gleichstand steht der frühere Eintrag höher (später zusätzlich Lebenspunkte/Züge), Eintrag nur nach Tod oder Sieg, gespeichert in einer Datei
+20. **Untersuchen mit Verzweigungen** (freie und versperrte Räume, Hindernis untersuchen, Folge-Interaktionen, Hinweise auf den nächsten Raum, Erkenntnis +2; Flavourtext zu jeder Aktion, auch Kampf, Funde und Tränke)
 
 ## Erste lauffähige Version (MVP) – umgesetzt
 Menü, Klassenwahl mit ASCII-Bildern, 5 Räume, Würfelmechanik (Wurfergebnis wird angezeigt), Skillchecks, Kampf, Items, Rangliste, Speichern und Laden.

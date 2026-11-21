@@ -35,7 +35,12 @@ Maven-Projekt (Java 21, JUnit 5). Pakete in `src/main/java`:
 - `game` – Spielablauf (`Game`), Hauptmenü, Klassenauswahl, Konsolen-Ein-/Ausgabe
 - `highscore` – Rangliste (Top 10), `save` – Spielstand
 - `item` – Items und Inventar
-- `story` – lädt ASCII-Bilder und Story-Texte aus `src/main/resources/` (`ascii/`, `story/`)
+- `story` – lädt ASCII-Bilder und Story-Texte aus `src/main/resources/` (`ascii/`, `story/`); `Flavour` wählt zufällig eine Textvariante
+
+Räume und Texte:
+- Jede Raumvorlage ist eine Datei `src/main/resources/story/rooms/NAME.properties` (`RoomScript` liest sie). Dort stehen Beschreibung, Hindernis, Ansätze und die Dinge zum Untersuchen (`poi.N.*`, optional mit `follow`). Neue Räume oder Texte gehören in diese Dateien, nicht in den Code.
+- Allgemeine Texte (Kampf, Funde, Fallen, Hinweise) stehen in `story/flavour.properties` mit Varianten `key.1`, `key.2`, ...
+- Alle Texte nur in ASCII (ae/oe/ue/ss). Die Tests `RoomScriptTest` und `FlavourTest` prüfen, dass nichts fehlt und alles ASCII ist.
 
 Zum Spielen `game.Main` starten. Beim Spielen entstehen `savegame.txt` und `highscores.txt` im Arbeitsordner (stehen in `.gitignore`).
 

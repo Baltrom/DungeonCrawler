@@ -22,6 +22,11 @@ public enum Difficulty {
         return displayName;
     }
 
+    /** Die naechstleichtere Stufe (leicht bleibt leicht). */
+    public Difficulty easier() {
+        return this == HARD ? MEDIUM : EASY;
+    }
+
     /** Die naechsthoehere Stufe (schwer bleibt schwer). */
     public Difficulty harder() {
         return this == EASY ? MEDIUM : HARD;

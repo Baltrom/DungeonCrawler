@@ -1,6 +1,7 @@
 package dungeon;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -10,6 +11,7 @@ import character.CharacterClass;
 import check.Difficulty;
 import item.Item;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -82,42 +84,101 @@ class DungeonGeneratorTest {
         }
     }
 
+    // --- freie und versperrte Raeume ---
+
     @Test
-    void everyNormalRoomHasTwoWaysWithTargetsInsideTheirDifficulty() {
+    void roomOneIsAlwaysFreeOneOfTwoAndThreeIsFreeAndRoomFourIsAlwaysBlocked() {
+        for (long seed = 0; seed < SEEDS; seed++) {
+            Dungeon dungeon = DungeonGenerator.generate(seed);
+            assertFalse(dungeon.room(0).blocked());
+            assertFalse(dungeon.room(1).blocked(), "Seed " + seed);
+            assertTrue(dungeon.room(4).blocked(), "Seed " + seed);
+            int freeAmongTwoAndThree = 0;
+            for (int i = 2; i <= 3; i++) {
+                if (!dungeon.room(i).blocked()) {
+                    freeAmongTwoAndThree++;
+                }
+            }
+            assertEquals(1, freeAmongTwoAndThree, "Seed " + seed);
+            assertFalse(dungeon.room(5).blocked());
+        }
+    }
+
+    @Test
+    void bothFreeRoomsOccurAcrossSeeds() {
+        Set<Integer> secondFree = new HashSet<>();
+        for (long seed = 0; seed < 100; seed++) {
+            Dungeon dungeon = DungeonGenerator.generate(seed);
+            secondFree.add(dungeon.room(2).blocked() ? 3 : 2);
+        }
+        assertEquals(Set.of(2, 3), secondFree);
+    }
+
+    @Test
+    void blockedRoomsHaveTwoWaysWithTargetsInsideTheirDifficultyAndFreeRoomsHaveNone() {
         for (long seed = 0; seed < SEEDS; seed++) {
             Dungeon dungeon = DungeonGenerator.generate(seed);
             for (int i = 1; i <= 4; i++) {
                 Room room = dungeon.room(i);
+                if (!room.blocked()) {
+                    assertTrue(room.wayOptions().isEmpty(), "Free room with ways, seed " + seed);
+                    continue;
+                }
                 assertEquals(2, room.wayOptions().size());
                 for (WayOption way : room.wayOptions()) {
                     Difficulty difficulty = way.difficulty();
-                    assertTrue(way.target() >= difficulty.getMinTarget()
-                            && way.target() <= difficulty.getMaxTarget());
+                    assertEquals(way.def().harder() ? Difficulty.HARD : Difficulty.MEDIUM, difficulty);
+                    assertTrue(way.target() >= difficulty.getMinTarget() && way.target() <= difficulty.getMaxTarget());
                 }
             }
         }
     }
 
+    // --- Interaktionen ---
+
     @Test
-    void waysGetHarderWithTheRoomNumberAndTheHarderApproach() {
-        Dungeon dungeon = DungeonGenerator.generate(7);
-        for (WayOption way : dungeon.room(1).wayOptions()) {
-            assertEquals(way.approach().harder() ? Difficulty.MEDIUM : Difficulty.EASY, way.difficulty());
-        }
-        for (int i = 2; i <= 4; i++) {
-            for (WayOption way : dungeon.room(i).wayOptions()) {
-                assertEquals(way.approach().harder() ? Difficulty.HARD : Difficulty.MEDIUM, way.difficulty());
+    void everyNormalRoomHasItsScriptInteractionsWithExactlyOneItemSpot() {
+        for (long seed = 0; seed < 50; seed++) {
+            Dungeon dungeon = DungeonGenerator.generate(seed);
+            for (int i = 1; i <= 4; i++) {
+                Room room = dungeon.room(i);
+                assertEquals(room.template().getScript().interactions().size(), room.interactions().size());
+                long itemSpots = room.interactions().stream()
+                        .filter(interaction -> interaction.def().effect() == Effect.ITEM).count();
+                assertEquals(1, itemSpots, "Room " + i + ", seed " + seed);
             }
         }
     }
 
     @Test
-    void lootDifficultyFollowsTheRoomNumber() {
-        Dungeon dungeon = DungeonGenerator.generate(3);
-        assertEquals(Difficulty.EASY, dungeon.room(1).loot().difficulty());
-        assertEquals(Difficulty.MEDIUM, dungeon.room(2).loot().difficulty());
-        assertEquals(Difficulty.MEDIUM, dungeon.room(3).loot().difficulty());
-        assertEquals(Difficulty.HARD, dungeon.room(4).loot().difficulty());
+    void checkTargetsStayInsideTheirDifficultyAndFollowDifficultyByRoom() {
+        for (long seed = 0; seed < SEEDS; seed++) {
+            Dungeon dungeon = DungeonGenerator.generate(seed);
+            for (int i = 0; i <= 4; i++) {
+                for (Interaction interaction : dungeon.room(i).interactions()) {
+                    assertCheckValues(interaction, i);
+                    if (interaction.follow() != null) {
+                        assertCheckValues(interaction.follow(), i);
+                    }
+                }
+            }
+        }
+    }
+
+    private void assertCheckValues(Interaction interaction, int roomIndex) {
+        if (interaction.def().attribute() == null) {
+            assertNull(interaction.difficulty());
+            assertEquals(0, interaction.target());
+            return;
+        }
+        Difficulty base = switch (roomIndex) {
+            case 0, 1 -> Difficulty.EASY;
+            case 4 -> Difficulty.HARD;
+            default -> Difficulty.MEDIUM;
+        };
+        Difficulty expected = interaction.def().easier() ? base.easier() : base;
+        assertEquals(expected, interaction.difficulty(), "Room " + roomIndex + " " + interaction.id());
+        assertTrue(interaction.target() >= expected.getMinTarget() && interaction.target() <= expected.getMaxTarget());
     }
 
     @Test
@@ -127,12 +188,17 @@ class DungeonGeneratorTest {
         for (long seed = 0; seed < 2000; seed++) {
             Dungeon dungeon = DungeonGenerator.generate(seed);
             for (int i = 1; i <= 4; i++) {
-                Item item = dungeon.room(i).loot().item();
-                spots++;
-                if (item == null) {
-                    empty++;
-                } else {
-                    assertNotEquals(Item.HEALING_POTION, item);
+                for (Interaction interaction : dungeon.room(i).interactions()) {
+                    if (interaction.def().effect() != Effect.ITEM) {
+                        assertNull(interaction.item(), "Only item spots hold items");
+                        continue;
+                    }
+                    spots++;
+                    if (interaction.item() == null) {
+                        empty++;
+                    } else {
+                        assertNotEquals(Item.HEALING_POTION, interaction.item());
+                    }
                 }
                 Item enemyItem = dungeon.room(i).enemyItem();
                 if (enemyItem != null) {
@@ -145,10 +211,13 @@ class DungeonGeneratorTest {
     }
 
     @Test
-    void startHelpDependsOnTheClass() {
+    void theEntranceOffersTheClassSpecificStartHelp() {
         Dungeon dungeon = DungeonGenerator.generate(5);
-        LootSpot mage = dungeon.startHelp(CharacterClass.MAGE);
-        LootSpot rogue = dungeon.startHelp(CharacterClass.ROGUE);
+        Room entrance = dungeon.room(0);
+        Interaction mage = entrance.interactions().stream()
+                .filter(i -> i.def().onlyFor() == CharacterClass.MAGE).findFirst().orElseThrow();
+        Interaction rogue = entrance.interactions().stream()
+                .filter(i -> i.def().onlyFor() == CharacterClass.ROGUE).findFirst().orElseThrow();
         assertEquals(Item.CHARGE_POTION, mage.item());
         assertEquals(Item.PROTECTION_AMULET, rogue.item());
         assertEquals(Difficulty.EASY, mage.difficulty());
@@ -156,10 +225,17 @@ class DungeonGeneratorTest {
     }
 
     @Test
+    void theBossRoomHasNoInteractionsAndAHardEncounter() {
+        Room boss = DungeonGenerator.generate(3).room(5);
+        assertTrue(boss.interactions().isEmpty());
+        assertTrue(boss.encounterTarget() >= 14 && boss.encounterTarget() <= 18);
+    }
+
+    @Test
     void ringOfLifeIsRarerThanOtherItems() {
         int rings = 0;
         int wisdom = 0;
-        java.util.Random random = new java.util.Random(11);
+        Random random = new Random(11);
         for (int i = 0; i < 20000; i++) {
             Item item = DungeonGenerator.pickItem(random);
             if (item == Item.RING_OF_LIFE) {

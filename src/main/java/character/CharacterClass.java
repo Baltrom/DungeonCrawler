@@ -4,7 +4,7 @@ import dice.Dice;
 
 public enum CharacterClass {
 
-    MAGE("Magier", "mage", 1, 2, 5, 12, 11, Dice.D6, Attribute.INTELLIGENCE, 3,
+    MAGE("Magier", "mage", 1, 2, 5, 14, 11, Dice.D6, Attribute.INTELLIGENCE, 3,
             "Alte Runen lesen, 3 Zauberladungen"),
     ROGUE("Schurke", "rogue", 2, 5, 1, 16, 13, Dice.D10, Attribute.DEXTERITY, 0,
             "Schloesser knacken, Fallen entschaerfen, Hinterhalt");

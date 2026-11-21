@@ -1,9 +1,11 @@
 package game;
 
+import character.CharacterClass;
 import character.Player;
 import character.Spell;
 import combat.Enemy;
 import dice.Dice;
+import story.Flavour;
 
 /**
  * Rundenbasierter Kampf. Treffer: D20 + Bonus gegen die Ruestungsklasse (1 verfehlt immer, 20 trifft immer).
@@ -19,17 +21,37 @@ class Combat {
     private final Enemy enemy;
     private final PlayerActions actions;
 
+    private final Flavour flavour;
+
     private int enemyHp;
     private int shieldBonus;
     private boolean ambushReady;
 
     Combat(ConsoleIO io, Dice dice, Player player, Enemy enemy, PlayerActions actions) {
+        this(io, dice, player, enemy, actions, new Flavour());
+    }
+
+    Combat(ConsoleIO io, Dice dice, Player player, Enemy enemy, PlayerActions actions, Flavour flavour) {
         this.io = io;
         this.dice = dice;
         this.player = player;
         this.enemy = enemy;
         this.actions = actions;
+        this.flavour = flavour;
         this.enemyHp = enemy.maxHp();
+    }
+
+    private String enemyKey() {
+        return switch (enemy.name()) {
+            case "Skelett" -> "skeleton";
+            case "Gargoyle" -> "gargoyle";
+            case "Der tote Koenig" -> "king";
+            default -> "default";
+        };
+    }
+
+    private String classKey() {
+        return player.getCharacterClass() == CharacterClass.MAGE ? "mage" : "rogue";
     }
 
     /**
@@ -54,9 +76,11 @@ class Combat {
         }
 
         if (player.isAlive()) {
+            io.report(flavour.pick("combat.win." + enemyKey()));
             io.report("Du hast " + enemy.name() + " besiegt!");
             return true;
         }
+        io.report(flavour.pick("combat.lose"));
         io.report(enemy.name() + " hat dich besiegt.");
         return false;
     }
@@ -116,6 +140,7 @@ class Combat {
         int roll = dice.rollD20();
         int bonus = player.getAttackBonus();
         boolean hit = hits(roll, bonus, enemy.armorClass());
+        io.report(flavour.pick((hit ? "combat.hit." : "combat.miss.") + classKey()));
         io.report("Dein Angriff: Wurf " + roll + " + " + bonus + " = " + (roll + bonus)
                 + " gegen RK " + enemy.armorClass() + " -> " + (hit ? "TREFFER" : "VERFEHLT"));
         if (!hit) {
@@ -125,6 +150,7 @@ class Combat {
         if (ambushReady) {
             ambushReady = false;
             damage += dice.roll(player.getCharacterClass().getDamageDie());
+            io.report(flavour.pick("combat.ambush"));
             io.report("Hinterhalt: doppelter Schaden!");
         }
         damage += player.getDamageBonus();
@@ -134,12 +160,13 @@ class Combat {
     private void cast(Spell spell) {
         switch (spell) {
             case FIREBALL -> {
-                io.report("Du schleuderst einen Feuerball. Er trifft immer.");
+                io.report(flavour.pick("combat.fireball"));
                 damageEnemy(dice.rollD10());
             }
             case SHIELD -> {
                 shieldBonus += Spell.SHIELD_BONUS;
-                io.report("Ein Schild aus Licht umgibt dich (+" + Spell.SHIELD_BONUS + " Ruestungsklasse).");
+                io.report(flavour.pick("combat.shield"));
+                io.report("Dein Schutzschild gibt dir +" + Spell.SHIELD_BONUS + " Ruestungsklasse.");
             }
             default -> throw new IllegalStateException("Spell not usable in combat: " + spell);
         }
@@ -156,6 +183,7 @@ class Combat {
         int roll = dice.rollD20();
         int armorClass = player.getArmorClass() + shieldBonus;
         boolean hit = hits(roll, enemy.attackBonus(), armorClass);
+        io.report(flavour.pick(hit ? "combat.enemyhit" : "combat.enemymiss", "{enemy}", enemy.name()));
         io.report(enemy.name() + " greift an: Wurf " + roll + " + " + enemy.attackBonus() + " = "
                 + (roll + enemy.attackBonus()) + " gegen deine RK " + armorClass
                 + " -> " + (hit ? "TREFFER" : "VERFEHLT"));

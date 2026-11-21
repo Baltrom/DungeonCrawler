@@ -60,7 +60,7 @@ class MainMenuTest {
 
     private static SaveGame sampleSave() {
         return new SaveGame(42L, "Lena", CharacterClass.ROGUE, 2, 11, 0, List.of(Item.IRON_KEY),
-                false, false, false, false);
+                List.of("poi1"), false, false, false, 0, false);
     }
 
     private void runWithInput(String... lines) {

@@ -13,8 +13,8 @@ class PlayerTest {
     void startsWithFullHpOfItsClass() {
         Player mage = new Player("Ria", CharacterClass.MAGE);
         Player rogue = new Player("Bob", CharacterClass.ROGUE);
-        assertEquals(12, mage.getCurrentHp());
-        assertEquals(12, mage.getMaxHp());
+        assertEquals(14, mage.getCurrentHp());
+        assertEquals(14, mage.getMaxHp());
         assertEquals(16, rogue.getCurrentHp());
         assertEquals(16, rogue.getMaxHp());
     }
@@ -38,7 +38,7 @@ class PlayerTest {
     void damageReducesHpButNotBelowZero() {
         Player player = new Player("Ria", CharacterClass.MAGE);
         player.takeDamage(5);
-        assertEquals(7, player.getCurrentHp());
+        assertEquals(9, player.getCurrentHp());
         assertTrue(player.isAlive());
         player.takeDamage(100);
         assertEquals(0, player.getCurrentHp());
@@ -50,9 +50,9 @@ class PlayerTest {
         Player player = new Player("Ria", CharacterClass.MAGE);
         player.takeDamage(8);
         player.heal(6);
-        assertEquals(10, player.getCurrentHp());
-        player.heal(6);
         assertEquals(12, player.getCurrentHp());
+        player.heal(6);
+        assertEquals(14, player.getCurrentHp());
     }
 
     @Test
@@ -74,7 +74,7 @@ class PlayerTest {
     void restoreStateRejectsValuesOutsideTheValidRange() {
         Player mage = new Player("Ria", CharacterClass.MAGE);
         assertThrows(IllegalArgumentException.class, () -> mage.restoreState(0, 1));
-        assertThrows(IllegalArgumentException.class, () -> mage.restoreState(13, 1));
+        assertThrows(IllegalArgumentException.class, () -> mage.restoreState(15, 1));
         assertThrows(IllegalArgumentException.class, () -> mage.restoreState(5, 4));
         assertThrows(IllegalArgumentException.class, () -> mage.restoreState(5, -1));
     }

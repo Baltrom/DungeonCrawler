@@ -7,16 +7,23 @@ import item.Item;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import story.Flavour;
 
 /** Aktionen des Spielers, die in jedem Auswahlmenue vorkommen: Trank trinken und Zauber wirken. */
 class PlayerActions {
 
     private final ConsoleIO io;
     private final Player player;
+    private final Flavour flavour;
 
     PlayerActions(ConsoleIO io, Player player) {
+        this(io, player, new Flavour());
+    }
+
+    PlayerActions(ConsoleIO io, Player player, Flavour flavour) {
         this.io = io;
         this.player = player;
+        this.flavour = flavour;
     }
 
     boolean canDrinkAnything() {
@@ -45,9 +52,11 @@ class PlayerActions {
         int hpBefore = player.getCurrentHp();
         player.drink(potion);
         if (potion == Item.HEALING_POTION) {
+            io.report(flavour.pick("potion.heal"));
             io.report("Du trinkst den Heiltrank und heilst " + (player.getCurrentHp() - hpBefore)
                     + " Lebenspunkte.");
         } else {
+            io.report(flavour.pick("potion.charge"));
             io.report("Du trinkst den Ladungstrank. Deine Zauberladungen sind wieder voll.");
         }
         return true;
