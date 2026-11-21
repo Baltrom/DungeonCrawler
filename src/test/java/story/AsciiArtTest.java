@@ -22,6 +22,15 @@ class AsciiArtTest {
     }
 
     @Test
+    void titlePictureIsAsciiOnly() {
+        List<String> lines = AsciiArt.load("title");
+        assertFalse(lines.isEmpty());
+        for (String line : lines) {
+            assertTrue(line.chars().allMatch(c -> c < 128), "Non-ASCII character in: " + line);
+        }
+    }
+
+    @Test
     void unknownPictureIsRejected() {
         assertThrows(IllegalArgumentException.class, () -> AsciiArt.load("does-not-exist"));
     }
