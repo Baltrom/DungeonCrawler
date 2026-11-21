@@ -1,23 +1,36 @@
 package game;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import character.CharacterClass;
+import character.Player;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class MainMenuTest {
 
     private final ByteArrayOutputStream output = new ByteArrayOutputStream();
+    private final List<Player> launchedPlayers = new ArrayList<>();
 
-    private void runWithInput(String... lines) {
+    private void runWithInput(GameResult resultOfTheGame, String... lines) {
         String input = String.join("\n", lines) + "\n";
         ConsoleIO io = new ConsoleIO(
                 new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)),
                 new PrintStream(output, true, StandardCharsets.UTF_8));
-        new MainMenu(io).run();
+        new MainMenu(io, player -> {
+            launchedPlayers.add(player);
+            return resultOfTheGame;
+        }).run();
+    }
+
+    private void runWithInput(String... lines) {
+        runWithInput(new GameResult(GameOutcome.DEATH, 0), lines);
     }
 
     private String printed() {
@@ -37,12 +50,24 @@ class MainMenuTest {
     }
 
     @Test
-    void newGameLeadsThroughClassSelectionAndBackToTheMenu() {
-        // Neues Spiel, Magier, Ja, Name, Enter, dann Beenden
-        runWithInput("1", "1", "1", "Ria", "", "4");
+    void newGameStartsTheGameForTheChosenCharacterAndShowsTheResult() {
+        // Neues Spiel, Magier, Ja, Name, (Spiel endet), Enter, Beenden
+        runWithInput(new GameResult(GameOutcome.DEATH, 3), "1", "1", "1", "Ria", "", "4");
+        assertEquals(1, launchedPlayers.size());
+        assertEquals("Ria", launchedPlayers.get(0).getName());
+        assertEquals(CharacterClass.MAGE, launchedPlayers.get(0).getCharacterClass());
         String text = printed();
-        assertTrue(text.contains("Willkommen, Ria der Magier!"));
+        assertTrue(text.contains("DU BIST GESTORBEN"));
+        assertTrue(text.contains("Ria der Magier erreichte Raum 3."));
         assertTrue(text.contains("Auf Wiedersehen!"));
+    }
+
+    @Test
+    void aVictoryShowsTheVictoryScreen() {
+        runWithInput(new GameResult(GameOutcome.VICTORY, 5), "1", "2", "1", "Bob", "", "4");
+        String text = printed();
+        assertTrue(text.contains("SIEG"));
+        assertTrue(text.contains("Bob der Schurke erreichte Raum 5."));
     }
 
     @Test

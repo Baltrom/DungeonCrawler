@@ -1,7 +1,11 @@
 package game;
 
 import character.Player;
+import dice.Dice;
+import dungeon.DungeonGenerator;
+import java.util.Random;
 import story.AsciiArt;
+import story.StoryText;
 
 public class MainMenu {
 
@@ -11,9 +15,16 @@ public class MainMenu {
     private static final int QUIT = 4;
 
     private final ConsoleIO io;
+    private final GameLauncher launcher;
 
     public MainMenu(ConsoleIO io) {
+        this(io, player -> new Game(io, new Dice(), player,
+                DungeonGenerator.generate(new Random().nextLong())).run());
+    }
+
+    public MainMenu(ConsoleIO io, GameLauncher launcher) {
         this.io = io;
+        this.launcher = launcher;
     }
 
     public void run() {
@@ -48,9 +59,27 @@ public class MainMenu {
 
     private void startNewGame() {
         Player player = new ClassSelection(io).run();
+        GameResult result = launcher.play(player);
+        showResult(player, result);
+    }
+
+    private void showResult(Player player, GameResult result) {
         io.clearScreen();
-        io.println("Willkommen, " + player.getName() + " der " + player.getCharacterClass().getDisplayName() + "!");
-        io.println("Das Abenteuer ist noch nicht gebaut.");
+        io.println("==================================================");
+        switch (result.outcome()) {
+            case VICTORY -> {
+                io.println("SIEG");
+                StoryText.load("victory").forEach(io::println);
+            }
+            case DEATH -> {
+                io.println("DU BIST GESTORBEN");
+                StoryText.load("death").forEach(io::println);
+            }
+            case SAVED -> io.println("SPIEL GESPEICHERT");
+        }
+        io.println("==================================================");
+        io.println(player.getName() + " der " + player.getCharacterClass().getDisplayName()
+                + " erreichte Raum " + result.roomsReached() + ".");
         io.println();
         io.readLine("Weiter mit Enter...");
     }
