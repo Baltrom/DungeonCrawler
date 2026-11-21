@@ -7,7 +7,7 @@
 5. **Eingabesystem** (Auswahl über nummerierte Optionen, z. B. 1–3 oder 1–5)
 6. **Würfelsystem (RNG)** mit D20, D10 und D6, Wurfergebnis wird angezeigt
 7. **Skillchecks** (D20 + Attribut gegen Schwierigkeitswert; 1 = immer Fehlschlag, 20 = immer Erfolg; nicht wiederholbar)
-8. **Klassenspezifische Aktionen** (Mage: Runen lesen; Rogue: Schloss knacken, Falle entschärfen, Akrobatik)
+8. **Klassenspezifische Aktionen** (Magier: Runen lesen, 3 gemeinsame Zauberladungen für Feuerball, Schutzschild und Arkane Sicht, „Zauber wirken“ in jedem Auswahlmenü mit Untermenü; Schurke: Schloss knacken, Falle entschärfen, Akrobatik)
 9. **Raum- und Dungeon-Struktur** (zufällig aus einem Seed erzeugt; Raum 0 liegt draußen vor dem Tor und zählt nicht, Raum 5 ist der Endgegner)
 10. **Lebenspunkte und Statusanzeige** des Spielers (max. 20, durch den Ring erhöhbar; Trank trinken in jedem Auswahlmenü)
 11. **Kampfsystem** (rundenbasiert, selten; Treffer = D20 + Attribut gegen Rüstungsklasse; Münzwurf für den Beginn, ein gelungener Schleichen- (Geschick) oder Spähen-Check (Intelligenz) lässt den Spieler beginnen; kein Fliehen; Schaden D6 Magier, D10 Schurke)

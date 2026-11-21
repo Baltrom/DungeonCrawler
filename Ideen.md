@@ -104,7 +104,21 @@ Entschieden: Es bleibt bei **2 Klassen** (Magier und Schurke).
   - Vorsichtiges Vorgehen wird belohnt: Der Spieler kann **schleichen** (Check auf Geschick) oder **spähen** (Check auf Intelligenz). Gelingt der Check, **beginnt der Spieler immer**. Misslingt er, entscheidet der normale Münzwurf.
 - **Fliehen ist nicht möglich.**
 - Schaden: **Magier D6**, **Schurke D10**.
-- Der Magier bekommt vielleicht eine begrenzte Anzahl Zauber (später besprechen).
+
+### Magier-Zauber
+- Der Magier hat **3 gemeinsame Zauberladungen** pro Spiel (für alle Zauber zusammen).
+- Ein normaler Angriff (Zauberstab, D6) kostet keine Ladung. Jeder Zauber kostet **1 Ladung**.
+- Ein **Trank, der Ladungen auffüllt**, ist als Item vorgesehen (Details bei den Items).
+- Die Option **„Zauber wirken“** steht in **jedem Auswahlmenü** und führt in ein Untermenü, in dem man den Zauber wählt.
+- Angriffsattribut: Der Magier würfelt Treffer mit **Intelligenz**, der Schurke mit **Geschick**.
+
+| Zauber       | Wirkung                                                          | Kosten    |
+|--------------|------------------------------------------------------------------|-----------|
+| Feuerball    | D10 Schaden, trifft immer (kein Trefferwurf)                     | 1 Ladung  |
+| Schutzschild | +3 Rüstungsklasse für den Rest des Kampfes                       | 1 Ladung  |
+| Arkane Sicht | +3 auf einen Intelligenz-Check (z. B. Spähen oder Runen lesen)   | 1 Ladung  |
+
+Für den Schurken ist als Gegenstück eine Fähigkeit wie **Hinterhalt** angedacht (erster Treffer macht doppelten Schaden nach gelungenem Schleichen-Check). Das wird bei den Gegnern besprochen.
 
 ### Dungeon
 - Der Dungeon ist **zufällig**, erzeugt aus einem **Seed**.
@@ -137,10 +151,10 @@ Entschieden: Es bleibt bei **2 Klassen** (Magier und Schurke).
 - Speichern und Laden
 
 ### Als Nächstes besprechen
-1. Magier-Zauber (begrenzte Anzahl)
+1. ~~Magier-Zauber~~ (erledigt, siehe oben)
 2. Arten der Skillchecks im Dungeon und ihre Auswirkungen (Fallen, Schaden)
-3. Konkrete Items (Ring, Tränke, Schlüssel, Loot von besonderen Gegnern)
-4. Gegner und Endgegner (inkl. Rüstungsklasse, Lebenspunkte, Schaden)
+3. Konkrete Items (Ring, Tränke inkl. Ladungstrank, Schlüssel, Loot von besonderen Gegnern)
+4. Gegner und Endgegner (inkl. Rüstungsklasse, Lebenspunkte, Schaden, Hinterhalt des Schurken)
 5. Story und Raumvorlagen
 
 ### Noch zu klären
