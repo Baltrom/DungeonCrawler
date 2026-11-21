@@ -25,9 +25,25 @@ Siehe auch:
 - Zwei getrennte Zufallsgeneratoren (`Random`): einer für die Dungeon-Erzeugung (Seed, wird gespeichert), einer für die Würfe. Die Würfe im Spiel werden nicht mit dem Seed erzeugt, sondern fallen jedes Mal neu aus. Ein fester Seed für Würfe ist nur für Tests gedacht.
 - Kurze Kommentare nur dort, wo die Absicht nicht offensichtlich ist.
 
+## Projektstruktur
+Maven-Projekt (Java 21, JUnit 5). Pakete in `src/main/java`:
+- `character` – Klassen (Magier, Schurke), Spieler, Attribute, Zauber
+- `check` – Skillchecks (D20 + Bonus), Schwierigkeitsstufen
+- `combat` – Gegnerwerte (der Kampfablauf selbst ist `game.Combat`)
+- `dice` – `Dice`, zentrale Würfelklasse
+- `dungeon` – Raumvorlagen, Dungeon-Erzeugung aus dem Seed
+- `game` – Spielablauf (`Game`), Hauptmenü, Klassenauswahl, Konsolen-Ein-/Ausgabe
+- `highscore` – Rangliste (Top 10), `save` – Spielstand
+- `item` – Items und Inventar
+- `story` – lädt ASCII-Bilder und Story-Texte aus `src/main/resources/` (`ascii/`, `story/`)
+
+Zum Spielen `game.Main` starten. Beim Spielen entstehen `savegame.txt` und `highscores.txt` im Arbeitsordner (stehen in `.gitignore`).
+
 ## Tests
 - Neue Logik (Würfel, Skillchecks, Kampf) mit JUnit-Tests abdecken.
 - Tests müssen vor dem Abschluss einer Aufgabe laufen.
+- Ausführen: in IntelliJ über den grünen Pfeil, oder mit dem von IntelliJ mitgebrachten Maven (`mvn test`). Auf der Kommandozeile ist weder `java` noch `mvn` im PATH, das JDK liegt unter `~/.jdks/openjdk-27`.
+- Für vorhersagbare Würfe in Tests gibt es `FixedDice` (feste Folge) und `MaxDice` (immer die höchste Zahl) in `src/test/java/dice/`.
 
 ## Arbeitsweise für Agenten
 1. Relevante Dateien lesen, bevor etwas geändert wird.

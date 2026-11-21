@@ -20,7 +20,7 @@
 18. **Hilfe-Befehl** (Erklärung der Steuerung und Regeln)
 19. **Rangliste (Top 10)** nach Anzahl erreichter Räume, bei Gleichstand steht der frühere Eintrag höher (später zusätzlich Lebenspunkte/Züge), Eintrag nur nach Tod oder Sieg, gespeichert in einer Datei
 
-## Erste lauffähige Version (MVP)
+## Erste lauffähige Version (MVP) – umgesetzt
 Menü, Klassenwahl mit ASCII-Bildern, 5 Räume, Würfelmechanik (Wurfergebnis wird angezeigt), Skillchecks, Kampf, Items, Rangliste, Speichern und Laden.
 
 Alles andere (z. B. Hilfe-Befehl, Fallen und Rätsel in größerem Umfang, mehr Räume) kommt später.

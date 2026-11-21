@@ -250,6 +250,19 @@ Raum 1–4 werden aus dem Seed aus einem Pool von acht Vorlagen gezogen. Jede Vo
 ### Noch zu klären
 Aktuell keine offenen Fragen.
 
+## Umsetzungsstand Version 1
+Version 1 ist umgesetzt: Hauptmenü, Klassenauswahl mit ASCII-Bildern, 5 Räume aus einem Seed, Würfelmechanik mit angezeigtem Wurfergebnis, Skillchecks, Kampf, Items, Rangliste, Speichern und Laden.
+
+Bei der Umsetzung festgelegt (Details, die oben noch offen waren):
+- **Speichern:** Menüpunkt „Speichern und zum Hauptmenue“ in den Raummenüs von Raum 0–4 (nicht im Kampf und nicht im Endgegner-Raum). Gespeichert wird in `savegame.txt`, auch was im Raum schon versucht wurde (Beute, Statue), damit man durch Speichern und Laden nichts wiederholen kann.
+- **Rangliste:** `highscores.txt`, Zeile pro Eintrag. Raum 0 zählt nicht, nach einem Sieg stehen 5 Räume.
+- **Schwierigkeit pro Raum:** Weg-Checks: Raum 1 leicht (schwerer Ansatz mittel), Raum 2–4 mittel (schwerer Ansatz schwer). Beute-Checks: Raum 1 leicht, Raum 2–3 mittel, Raum 4 schwer. Die schwereren Ansätze sind die Stärke-Ansätze „aufbrechen“ sowie je ein Ansatz in Bibliothek und Fallengang.
+- **Kampf:** Eine 1 verfehlt und eine 20 trifft auch bei Angriffen immer. Das Schutzschild kann mehrfach gewirkt werden (die Boni addieren sich). Der Hinterhalt wirkt nur für den Schurken und nur nach gelungenem Schleichen (nicht nach Spähen).
+- **Ring des Lebens:** Schenkt die zusätzlichen Lebenspunkte beim Aufnehmen sofort (aktuell +3) und senkt sie beim Wegwerfen wieder auf das neue Maximum.
+- **Beute am Leichnam:** Der gewöhnliche Gegner hat keine eigene Beute. Das Looten eines Toten ist die Beute-Aktion der Raumvorlage „Die Gruft“.
+- **Name:** Keine Umlaute (nur A–Z, a–z, 0–9).
+- **Würfe:** Sind nicht an den Seed gebunden. Beim Laden wird der Dungeon aus dem Seed neu erzeugt, die Würfe fallen neu aus.
+
 ## Nächste Schritte
 - [x] Eingabesystem entscheiden (nummerierte Auswahl)
 - [x] Anzahl Klassen festlegen (2: Magier, Schurke)
@@ -258,4 +271,6 @@ Aktuell keine offenen Fragen.
 - [x] Umfang der ersten Version festlegen (5 Räume)
 - [x] Die fünf Themen unter „Als Nächstes besprechen“ durchgehen
 - [x] Punkte aus „Noch zu klären“ entscheiden
-- [ ] Projektgerüst anlegen und mit der Umsetzung beginnen
+- [x] Projektgerüst anlegen und Version 1 umsetzen
+- [ ] Version 1 selbst durchspielen und die Werte feintunen (Gegner, Schwierigkeit, Items)
+- [ ] Spätere Versionen: mehr Räume, mehr Items und Heiltränke, Endgegner mit Spezialangriffen, Zweitkriterium in der Rangliste (Lebenspunkte/Züge)
