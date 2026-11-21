@@ -24,14 +24,25 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import save.SaveGame;
+import save.SaveManager;
 
 class GameTest {
 
+    @TempDir
+    Path dir;
+
     private final ByteArrayOutputStream output = new ByteArrayOutputStream();
     private final Dungeon dungeon = DungeonGenerator.generate(1);
+
+    private SaveManager saves() {
+        return new SaveManager(dir.resolve("savegame.txt"));
+    }
 
     private ConsoleIO io(String... lines) {
         String input = String.join("\n", lines) + "\n";
@@ -41,7 +52,7 @@ class GameTest {
     }
 
     private Game gameAt(int room, Dice dice, Player player, ConsoleIO io) {
-        return new Game(io, dice, player, dungeon, room, new RoomProgress(), false, false);
+        return new Game(io, dice, player, dungeon, room, new RoomProgress(), false, false, saves());
     }
 
     private String printed() {
@@ -167,8 +178,8 @@ class GameTest {
     @Test
     void arcaneSightAddsThreeToTheNextIntelligenceCheckOnly() {
         Player mage = new Player("Ria", CharacterClass.MAGE);
-        // Zauber wirken (3), Arkane Sicht (1), Beute (1), Tor (1)
-        Game game = gameAt(0, new FixedDice(20), mage, io("3", "1", "1", "1"));
+        // Menue: Beute (1), Tor (2), Speichern (3), Zauber wirken (4). Dann Arkane Sicht (1), Beute (1), Tor (1)
+        Game game = gameAt(0, new FixedDice(20), mage, io("4", "1", "1", "1"));
         assertEquals(RoomResult.NEXT, game.playRoom());
         assertEquals(2, mage.getSpellCharges());
         assertTrue(printed().contains("+ 8 Intelligenz + Arkane Sicht"));
@@ -178,11 +189,85 @@ class GameTest {
     @Test
     void arcaneSightCannotBeStacked() {
         Player mage = new Player("Ria", CharacterClass.MAGE);
-        // Zauber, Arkane Sicht, nochmal Zauber, dann Tor
-        Game game = gameAt(0, new Dice(), mage, io("3", "1", "3", "2"));
+        // Zauber (4), Arkane Sicht, nochmal Zauber (4), dann Tor (2)
+        Game game = gameAt(0, new Dice(), mage, io("4", "1", "4", "2"));
         assertEquals(RoomResult.NEXT, game.playRoom());
         assertEquals(2, mage.getSpellCharges());
         assertTrue(printed().contains("wirkt bereits"));
+    }
+
+    // --- Speichern und Laden ---
+
+    @Test
+    void savingWritesTheCurrentStateAndEndsTheSession() {
+        Player mage = new Player("Ria", CharacterClass.MAGE);
+        mage.takeDamage(3);
+        mage.addItem(Item.IRON_KEY);
+        // Raum 0: Beute (1), Tor (2), Speichern (3)
+        Game game = gameAt(0, new Dice(), mage, io("3"));
+        assertEquals(RoomResult.SAVED, game.playRoom());
+
+        SaveGame save = saves().load().orElseThrow();
+        assertEquals(dungeon.seed(), save.seed());
+        assertEquals("Ria", save.name());
+        assertEquals(CharacterClass.MAGE, save.characterClass());
+        assertEquals(0, save.roomIndex());
+        assertEquals(9, save.currentHp());
+        assertEquals(3, save.spellCharges());
+        assertEquals(List.of(Item.IRON_KEY), save.items());
+        assertFalse(save.lootTried());
+        assertTrue(printed().contains("Spiel gespeichert."));
+    }
+
+    @Test
+    void aLoadedGameContinuesInTheSameRoomAndDoesNotOfferWhatWasAlreadyTried() {
+        Player mage = new Player("Ria", CharacterClass.MAGE);
+        // Beute versuchen (1) und scheitern, dann Speichern (Menue: Tor (1), Speichern (2))
+        Game game = gameAt(0, new FixedDice(1), mage, io("1", "2"));
+        assertEquals(RoomResult.SAVED, game.playRoom());
+        SaveGame save = saves().load().orElseThrow();
+        assertTrue(save.lootTried());
+
+        output.reset();
+        Game resumed = Game.fromSave(io("1"), new Dice(), save, saves());
+        assertEquals(RoomResult.NEXT, resumed.playRoom());
+        assertFalse(printed().contains("Die Runen am Tor lesen"), "The loot attempt must not be offered again");
+        assertTrue(printed().contains("RAUM 0 - Vor dem Tor"));
+    }
+
+    @Test
+    void aSavedGameRestoresHpItemsChargesAndArcaneSight() {
+        Player mage = new Player("Ria", CharacterClass.MAGE);
+        mage.addItem(Item.RING_OF_LIFE);
+        mage.takeDamage(5);
+        mage.useSpellCharge();
+        Game game = new Game(io("3"), new Dice(), mage, dungeon, 0, new RoomProgress(), true, false, saves());
+        assertEquals(RoomResult.SAVED, game.playRoom());
+
+        Game resumed = Game.fromSave(io(), new Dice(), saves().load().orElseThrow(), saves());
+        assertTrue(resumed.isArcaneSight());
+        SaveGame again = resumed.snapshot();
+        assertEquals(10, again.currentHp());
+        assertEquals(2, again.spellCharges());
+        assertEquals(List.of(Item.RING_OF_LIFE), again.items());
+    }
+
+    @Test
+    void aGameLoadedInALaterRoomHasTheSameDungeon() {
+        Player rogue = new Player("Bob", CharacterClass.ROGUE);
+        // Ein eventueller gewoehnlicher Gegner gilt als besiegt, damit gleich das Raummenue erscheint
+        Game game = new Game(io(String.valueOf(saveOptionNumber(3))), new Dice(), rogue, dungeon, 3,
+                new RoomProgress(false, false, true), false, false, saves());
+        assertEquals(RoomResult.SAVED, game.playRoom());
+        SaveGame save = saves().load().orElseThrow();
+        assertEquals(3, save.roomIndex());
+        assertEquals(dungeon, DungeonGenerator.generate(save.seed()));
+    }
+
+    /** Die Nummer von "Speichern" im Menue eines normalen Raums ohne Gegner-Begegnung beim Betreten. */
+    private int saveOptionNumber(int roomIndex) {
+        Room room = dungeon.room(roomIndex);
+        return 1 + (room.enemy() == EnemyKind.SPECIAL ? 1 : 0) + room.wayOptions().size() + 1;
     }
 
     // --- Ein ganzer Durchlauf ---

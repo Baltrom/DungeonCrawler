@@ -63,6 +63,23 @@ class PlayerTest {
     }
 
     @Test
+    void restoreStateSetsHpAndSpellCharges() {
+        Player mage = new Player("Ria", CharacterClass.MAGE);
+        mage.restoreState(5, 1);
+        assertEquals(5, mage.getCurrentHp());
+        assertEquals(1, mage.getSpellCharges());
+    }
+
+    @Test
+    void restoreStateRejectsValuesOutsideTheValidRange() {
+        Player mage = new Player("Ria", CharacterClass.MAGE);
+        assertThrows(IllegalArgumentException.class, () -> mage.restoreState(0, 1));
+        assertThrows(IllegalArgumentException.class, () -> mage.restoreState(13, 1));
+        assertThrows(IllegalArgumentException.class, () -> mage.restoreState(5, 4));
+        assertThrows(IllegalArgumentException.class, () -> mage.restoreState(5, -1));
+    }
+
+    @Test
     void invalidNameIsRejected() {
         assertThrows(IllegalArgumentException.class, () -> new Player("Max Muster", CharacterClass.ROGUE));
         assertThrows(IllegalArgumentException.class, () -> new Player("", CharacterClass.ROGUE));

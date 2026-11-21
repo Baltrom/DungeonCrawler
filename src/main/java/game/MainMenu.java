@@ -1,13 +1,14 @@
 package game;
 
+import character.CharacterClass;
 import character.Player;
-import dice.Dice;
-import dungeon.DungeonGenerator;
 import highscore.HighscoreEntry;
 import highscore.Highscores;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
+import save.SaveGame;
+import save.SaveManager;
 import story.AsciiArt;
 import story.StoryText;
 
@@ -23,17 +24,21 @@ public class MainMenu {
     private final ConsoleIO io;
     private final GameLauncher launcher;
     private final Highscores highscores;
+    private final SaveManager saveManager;
 
     public MainMenu(ConsoleIO io) {
-        this(io, player -> new Game(io, new Dice(), player,
-                DungeonGenerator.generate(new Random().nextLong())).run(),
-                new Highscores(Path.of("highscores.txt")));
+        this(io, new SaveManager(Path.of("savegame.txt")), new Highscores(Path.of("highscores.txt")));
     }
 
-    public MainMenu(ConsoleIO io, GameLauncher launcher, Highscores highscores) {
+    private MainMenu(ConsoleIO io, SaveManager saveManager, Highscores highscores) {
+        this(io, new DefaultGameLauncher(io, saveManager), highscores, saveManager);
+    }
+
+    public MainMenu(ConsoleIO io, GameLauncher launcher, Highscores highscores, SaveManager saveManager) {
         this.io = io;
         this.launcher = launcher;
         this.highscores = highscores;
+        this.saveManager = saveManager;
     }
 
     public void run() {
@@ -43,7 +48,7 @@ public class MainMenu {
             int choice = io.askChoice("Deine Wahl: ", NEW_GAME, QUIT);
             switch (choice) {
                 case NEW_GAME -> startNewGame();
-                case LOAD_GAME -> notAvailableYet("Spiel laden");
+                case LOAD_GAME -> loadGame();
                 case HIGHSCORES -> showHighscores();
                 case QUIT -> running = false;
                 default -> throw new IllegalStateException("Unexpected menu choice: " + choice);
@@ -69,11 +74,31 @@ public class MainMenu {
     private void startNewGame() {
         Player player = new ClassSelection(io).run();
         GameResult result = launcher.play(player);
-        showResult(player, result);
+        finishGame(player.getName(), player.getCharacterClass(), result);
     }
 
-    /** Zeigt das Ende des Spiels. Nach Tod oder Sieg kommt der Eintrag in die Rangliste. */
-    private void showResult(Player player, GameResult result) {
+    /** Laedt den Spielstand. Der alte Spielstand wird dabei geloescht, damit es kein Savescumming gibt. */
+    private void loadGame() {
+        if (!saveManager.exists()) {
+            message("Es gibt keinen gespeicherten Spielstand.");
+            return;
+        }
+        Optional<SaveGame> save = saveManager.load();
+        if (save.isEmpty()) {
+            message("Der Spielstand ist beschaedigt und kann nicht geladen werden.");
+            return;
+        }
+        saveManager.delete();
+        SaveGame loaded = save.get();
+        GameResult result = launcher.resume(loaded);
+        finishGame(loaded.name(), loaded.characterClass(), result);
+    }
+
+    /**
+     * Zeigt das Ende des Spiels. Nach Tod oder Sieg kommt zuerst der Eintrag in die Rangliste,
+     * danach wird der Spielstand geloescht.
+     */
+    private void finishGame(String name, CharacterClass characterClass, GameResult result) {
         io.clearScreen();
         io.println(LINE);
         switch (result.outcome()) {
@@ -88,15 +113,16 @@ public class MainMenu {
             case SAVED -> io.println("SPIEL GESPEICHERT");
         }
         io.println(LINE);
-        io.println(player.getName() + " der " + player.getCharacterClass().getDisplayName()
-                + " erreichte Raum " + result.roomsReached() + ".");
+        io.println(name + " der " + characterClass.getDisplayName() + " erreichte Raum "
+                + result.roomsReached() + ".");
 
         if (result.outcome() != GameOutcome.SAVED) {
             Highscores.AddResult added = highscores.add(
-                    new HighscoreEntry(player.getName(), player.getCharacterClass(), result.roomsReached()));
+                    new HighscoreEntry(name, characterClass, result.roomsReached()));
             io.println(added.rank() > 0
                     ? "Platz " + added.rank() + " in der Rangliste!"
                     : "Das reicht nicht fuer die Top " + Highscores.MAX_ENTRIES + ".");
+            saveManager.delete();
         }
         io.println();
         io.readLine("Weiter mit Enter...");
@@ -118,9 +144,9 @@ public class MainMenu {
         io.readLine("Weiter mit Enter...");
     }
 
-    private void notAvailableYet(String feature) {
+    private void message(String text) {
         io.println();
-        io.println(feature + " ist noch nicht verfuegbar.");
+        io.println(text);
         io.println();
         io.readLine("Weiter mit Enter...");
     }

@@ -1,10 +1,12 @@
 package game;
 
 import character.Player;
+import save.SaveGame;
 
-/** Startet ein Spiel fuer einen frisch erstellten Spieler. Erlaubt es, das Menue ohne echtes Spiel zu testen. */
-@FunctionalInterface
+/** Startet ein neues oder gespeichertes Spiel. Erlaubt es, das Menue ohne echtes Spiel zu testen. */
 public interface GameLauncher {
 
     GameResult play(Player player);
+
+    GameResult resume(SaveGame save);
 }

@@ -75,6 +75,18 @@ public class Player {
         currentHp = Math.min(getMaxHp(), currentHp + amount);
     }
 
+    /** Setzt Lebenspunkte und Zauberladungen nach dem Laden eines Spielstands. Items muessen schon im Inventar sein. */
+    public void restoreState(int currentHp, int spellCharges) {
+        if (currentHp < 1 || currentHp > getMaxHp()) {
+            throw new IllegalArgumentException("Invalid HP: " + currentHp);
+        }
+        if (spellCharges < 0 || spellCharges > characterClass.getSpellCharges()) {
+            throw new IllegalArgumentException("Invalid spell charges: " + spellCharges);
+        }
+        this.currentHp = currentHp;
+        this.spellCharges = spellCharges;
+    }
+
     // --- Zauberladungen ---
 
     public int getSpellCharges() {

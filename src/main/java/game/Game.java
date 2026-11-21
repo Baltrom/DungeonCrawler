@@ -10,6 +10,7 @@ import check.SkillCheck;
 import combat.Enemy;
 import dice.Dice;
 import dungeon.Dungeon;
+import dungeon.DungeonGenerator;
 import dungeon.EnemyKind;
 import dungeon.LootSpot;
 import dungeon.Room;
@@ -20,6 +21,8 @@ import item.Item;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import save.SaveGame;
+import save.SaveManager;
 import story.StoryText;
 
 /** Ein laufendes Spiel: fuehrt den Spieler Raum fuer Raum durch den Dungeon. */
@@ -40,22 +43,31 @@ public class Game {
     private final Dungeon dungeon;
     private final PlayerActions actions;
     private final boolean showIntro;
+    private final SaveManager saveManager;
     private int roomIndex;
     private int roomsReached;
     private RoomProgress progress;
     private boolean arcaneSight;
 
     /** Neues Spiel: beginnt mit der Einleitung in Raum 0. */
-    public Game(ConsoleIO io, Dice dice, Player player, Dungeon dungeon) {
-        this(io, dice, player, dungeon, 0, new RoomProgress(), false, true);
+    public Game(ConsoleIO io, Dice dice, Player player, Dungeon dungeon, SaveManager saveManager) {
+        this(io, dice, player, dungeon, 0, new RoomProgress(), false, true, saveManager);
+    }
+
+    /** Spielstand laden: der Dungeon wird aus dem gespeicherten Seed neu erzeugt, es gibt keine Einleitung mehr. */
+    static Game fromSave(ConsoleIO io, Dice dice, SaveGame save, SaveManager saveManager) {
+        return new Game(io, dice, save.toPlayer(), DungeonGenerator.generate(save.seed()), save.roomIndex(),
+                new RoomProgress(save.lootTried(), save.specialDone(), save.ordinaryDefeated()),
+                save.arcaneSight(), false, saveManager);
     }
 
     Game(ConsoleIO io, Dice dice, Player player, Dungeon dungeon, int roomIndex,
-         RoomProgress progress, boolean arcaneSight, boolean showIntro) {
+         RoomProgress progress, boolean arcaneSight, boolean showIntro, SaveManager saveManager) {
         this.io = io;
         this.dice = dice;
         this.player = player;
         this.dungeon = dungeon;
+        this.saveManager = saveManager;
         this.actions = new PlayerActions(io, player);
         this.roomIndex = roomIndex;
         this.roomsReached = roomIndex;
@@ -174,6 +186,8 @@ public class Game {
                     handlers.add(this::useKey);
                 }
             }
+            labels.add("Speichern und zum Hauptmenue");
+            handlers.add(this::saveAndExit);
 
             int index = chooseAction("Was tust du?", labels);
             RoomResult result = handlers.get(index).get();
@@ -414,7 +428,21 @@ public class Game {
         }
     }
 
-    // --- Zugriff fuer Speichern, Tests ---
+    // --- Speichern ---
+
+    private RoomResult saveAndExit() {
+        saveManager.save(snapshot());
+        io.println("Spiel gespeichert.");
+        return RoomResult.SAVED;
+    }
+
+    SaveGame snapshot() {
+        return new SaveGame(dungeon.seed(), player.getName(), player.getCharacterClass(), roomIndex,
+                player.getCurrentHp(), player.getSpellCharges(), player.getItems(),
+                progress.lootTried, progress.specialDone, progress.ordinaryDefeated, arcaneSight);
+    }
+
+    // --- Zugriff fuer Tests ---
 
     int getRoomIndex() {
         return roomIndex;
