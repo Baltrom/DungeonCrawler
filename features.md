@@ -23,6 +23,9 @@ Stand Version 1: **[x]** = umgesetzt und getestet, **[ ]** = noch nicht umgesetz
 19. [x] **Rangliste (Top 10)** nach Anzahl erreichter Räume, bei Gleichstand steht der frühere Eintrag höher (später zusätzlich Lebenspunkte/Züge), Eintrag nur nach Tod oder Sieg, gespeichert in einer Datei
 20. [x] **Untersuchen mit Verzweigungen** (freie und versperrte Räume, Hindernis untersuchen, Folge-Interaktionen, Hinweise auf den nächsten Raum, Erkenntnis +2; Flavourtext zu jeder Aktion, auch Kampf, Funde und Tränke)
 
+21. [x] **Farbige Ausgabe (ANSI)** im Terminal-Tab von IntelliJ (Text mit Farben nach fester Palette, `--plain` schaltet sie ab, Klasse `game.Ansi`)
+22. [x] **Farbige ASCII-Bilder** (Titel, Magier, Schurke) und **ein Bild für jeden Raum** (Raum 0, acht Vorlagen, Thronsaal), erscheint beim Betreten des Raums; `tools/AnsiDemo.java` blättert mit Enter durch alle Bilder
+
 ## Erste lauffähige Version (MVP) – umgesetzt
 Menü, Klassenwahl mit ASCII-Bildern, 5 Räume, Würfelmechanik (Wurfergebnis wird angezeigt), Skillchecks, Kampf, Items, Rangliste, Speichern und Laden.
 

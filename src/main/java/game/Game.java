@@ -58,6 +58,7 @@ public class Game {
     private String header = "";
     private List<String> description = List.of();
     private String artName;
+    private boolean showArt;
 
     /** Neues Spiel: beginnt mit der Einleitung in Raum 0. */
     public Game(ConsoleIO io, Dice dice, Player player, Dungeon dungeon, SaveManager saveManager) {
@@ -131,6 +132,7 @@ public class Game {
         header = "RAUM " + room.index() + " - " + script.name();
         description = script.description();
         artName = script.extra().get("art");
+        showArt = artName != null; // das Bild erscheint nur beim Betreten des Raums
 
         if (room.kind() == RoomKind.BOSS) {
             return playBossRoom(room, script);
@@ -472,10 +474,11 @@ public class Game {
             io.println(Ansi.gold(LINE));
             io.println(Ansi.gold(header));
             io.println(Ansi.gold(LINE));
-            if (artName != null) {
+            if (showArt) {
                 for (String line : ArtPainter.paint(artName, AsciiArt.load(artName))) {
                     io.println(line);
                 }
+                showArt = false;
             }
             for (String line : description) {
                 io.println(Ansi.grey(line));

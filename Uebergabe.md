@@ -10,10 +10,10 @@
 |---|---|
 | Was | Textbasierter Dungeon Crawler in Java (Konsole), Studienprojekt „Einführung Software Engineering“ |
 | Autor | Nikolaus Koch (wi26b166), Solo-Projekt: nur der Autor und Claude |
-| Repository | https://github.com/Baltrom/DungeonCrawler (privat), Branch `main` |
-| Projektordner | `C:\WI26\Einführung SoftwareEngineering\STPRO\DungeonCrawler` |
+| Repository | https://github.com/Baltrom/DungeonCrawler (privat), Branch `main` (Branch `raumbilder` ist nach `main` gemergt) |
+| Projektordner | `C:\wi26\Strukturiertes Programmieren\BWISTPRO\DungeonCrawler` (Benutzer `PC`) |
 | Spielidee | Gruft eines toten Königs, düster. Klasse wählen (Magier oder Schurke), 5 Räume, Endgegner, Würfel (D20, D10, D6) |
-| Stand | **Version 1 ist fertig und abgegeben** (Code, Handbuch, Feature-Häkchen, Prompt Diary). 201 Tests grün. |
+| Stand | **Version 1 ist fertig und abgegeben**, danach kamen die Anzeige „Raum zuerst“, **ANSI-Farben**, **farbige ASCII-Bilder** und **ein Bild pro Raum** dazu. 206 Tests grün. Nächstes Thema: offen, der Autor nennt es im neuen Chat (Kandidaten in Abschnitt 9). |
 
 ## 2. Wie der Autor arbeiten will (wichtig)
 
@@ -21,7 +21,7 @@
 - **Erst besprechen, dann bauen.** Entscheidungen werden im Gespräch getroffen und in `Ideen.md` festgehalten. Bei größeren Änderungen an der Struktur vorher fragen.
 - **Offene Fragen immer als nummerierte Liste am Ende der Antwort.** (Ausdrücklicher Wunsch des Autors.)
 - **Kurze Entscheidungen** gibt der Autor als Liste („1 passt, 2 nein, …“). Darauf einzeln antworten.
-- **Commit und Push nur nach Ansage** („Ja, committen“, „pushe main“). In der V1-Phase galt: nach jedem abgehakten Punkt pushen. Direkt auf `main`, keine Feature-Branches mehr nötig.
+- **Commit und Push nur nach Ansage** („Ja, committen“, „pushe main“). Neue größere Arbeit auf Wunsch zuerst auf einem eigenen Branch (so lief es bei `raumbilder`), nach Freigabe des Autors („kann auf main“) nach `main` mergen und pushen.
 - **Dateien des Autors nicht überschreiben oder löschen**, ohne zu fragen (`Prompt Diary.pdf`, `Ideen.zip`, eigene Texte).
 - **Alles, was entschieden oder gebaut wird, steht in Markdown-Dateien im Repository**, damit in einem neuen Chat weitergearbeitet werden kann. Nach jeder Sitzung: `Uebergabe.md`, `PromptDiary.md`, `Ideen.md`, `features.md` aktualisieren.
 - Der Autor spielt das Spiel selbst durch und liefert danach eine **Feinschliff-Liste**. Diese wird gebündelt abgearbeitet.
@@ -30,21 +30,24 @@
 
 | | |
 |---|---|
-| IDE | IntelliJ IDEA 2026.2.3, Projekt ist dort offen (MCP-Zugriff: `projectPath` = Projektordner, mit `/` statt `\`) |
-| JDK | `C:\Users\Baltrom\.jdks\openjdk-27` (Java-Ziel 21 in der `pom.xml`) |
-| Maven | Nicht im PATH. Das von IntelliJ mitgebrachte: `C:\Users\Baltrom\AppData\Local\Programs\IntelliJ IDEA 2026.2.3\plugins\maven-plugin\lib\maven3\bin\mvn.cmd` (Pfad ändert sich mit der IntelliJ-Version) |
-| GitHub | `gh` ist als `Baltrom` angemeldet |
-| Shell | PowerShell. `java` und `mvn` sind nicht im PATH |
+| IDE | IntelliJ IDEA, Projekt ist dort offen (MCP-Zugriff: `projectPath` = Projektordner, mit `/` statt `\`). Der Autor spielt im **Terminal-Tab** |
+| JDK | `C:\Java\jdk-26` (Java-Ziel 21 in der `pom.xml`). Im IntelliJ-Terminal ist `java` im PATH |
+| Maven | Nicht im PATH. Das von IntelliJ mitgebrachte, zuletzt gefunden unter `C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd` (Pfad ändert sich mit der IntelliJ-Version, im Zweifel mit `Get-ChildItem -Recurse -Filter mvn.cmd` unter `C:\Program Files\JetBrains` suchen) |
+| GitHub | `gh` und die Git-Identität: frühere Commits stammen von `Baltrom <niko.und.ria@proton.me>`. Auf diesem Rechner ist keine globale Identität gesetzt, deshalb beim Commit `git -c user.name=Baltrom -c user.email=niko.und.ria@proton.me commit ...` benutzen |
+| Python | Über `py` verfügbar (3.13). Wurde für das Erzeugen der Raumbilder benutzt |
+| Shell | PowerShell. `java` und `mvn` sind in der Claude-PowerShell nicht im PATH, `java` liegt unter `C:\Java\jdk-26\bin` |
 
 **Tests ausführen:**
 ```powershell
-$env:JAVA_HOME = "C:\Users\Baltrom\.jdks\openjdk-27"
-& "C:\Users\Baltrom\AppData\Local\Programs\IntelliJ IDEA 2026.2.3\plugins\maven-plugin\lib\maven3\bin\mvn.cmd" -B test
+$env:JAVA_HOME = "C:\Java\jdk-26"
+& "C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd" -B test
 ```
 
-**Spiel von Hand starten:** `game.Main` in IntelliJ (grüner Pfeil). Per Skript: `java -cp target/classes game.Main` mit Eingaben aus einer Datei. Der Arbeitsordner bekommt dann `savegame.txt` und `highscores.txt`.
+**Spiel von Hand starten:** Im IntelliJ-Terminal-Tab nach **Build → Build Project**: `java -cp target/classes game.Main` (`--plain` ohne Farben). Die Run-Konsole zeigt keine Farben richtig. Der Arbeitsordner bekommt dann `savegame.txt` und `highscores.txt`. Bilder ansehen: `java -cp target/classes tools/AnsiDemo.java`.
 
 **Stolpersteine auf dieser Maschine:**
+- Ausgabe von Claude-Befehlen zeigt keine Farben. Wie etwas aussieht, sieht nur der Autor (Screenshot schicken lassen).
+- Eingaben per Pipe aus PowerShell (`"4" | java ...`) kommen wegen der Codierung nicht sauber an. Für Skripttests besser eine Datei mit `<` umleiten oder die JUnit-Tests nehmen.
 - Die Run-Konfiguration über das IntelliJ-MCP (`execute_run_configuration`) lief bei Tests in eine Zeitüberschreitung. Maven direkt funktioniert.
 - In PowerShell-Here-Strings für Commit-Nachrichten dürfen **keine doppelten Anführungszeichen** vorkommen (der Commit scheitert sonst).
 - Dateien mit Windows-1252 (z. B. die alte `Readme.md.txt`) lassen sich nicht mit dem Schreib-Werkzeug überschreiben. Dann über eine UTF-8-Kopie ersetzen.
@@ -138,7 +141,7 @@ Die Werte (Gegner, Falle, Lebenspunkte) stehen in der Datei als Zahlen und müss
 
 ## 8. Git-Stand und Dateien
 
-- Alles committet und gepusht, nur der Branch `main` existiert (lokal und auf GitHub).
+- Nach der Sitzung zu Farben und Bildern: `main` enthält alles (Branch `raumbilder` wurde per Fast-Forward nach `main` gemergt und liegt weiter auf GitHub). Mit `git status` und `git log --oneline -5` prüfen.
 - Im Repository: `src/` (Code, Texte, Tests), `pom.xml`, `.gitignore` (ignoriert `target/`, `.idea/`, `out/`, `savegame.txt`, `highscores.txt`), `tools/`.
 - Doku: `Readme.md`, `manual.md` (Bedienung), `features.md` (Häkchen), `Ideen.md` (Ideen, Entscheidungen, Feinschliff), `agents.md` (Regeln), `PromptDiary.md`, diese Datei.
 - Vom Autor: `Prompt Diary.pdf`, `Ideen.zip` (älterer Stand der Dokumente). Nicht anfassen.
@@ -146,9 +149,11 @@ Die Werte (Gegner, Falle, Lebenspunkte) stehen in der Datei als Zahlen und müss
 
 ## 9. Wie es weitergeht (offen)
 
-**Aktuell (Sitzung nach V1):** Der Autor will **jeden einzelnen Raum mit ihm durchgehen und ihm Charakter geben** (Raum 0, acht Vorlagen, Thronsaal), danach die Räume **personalisieren**. Ein Raum pro Schritt, erst besprechen, dann in `story/rooms/NAME.properties` schreiben. Steht als TODO in `Ideen.md`.
+**Nächstes Thema:** Der Autor nennt es zu Beginn des neuen Chats. Offene Kandidaten: (a) **Räume mit Charakter füllen** (jeden Raum einzeln durchgehen, dann personalisieren, ein Raum pro Schritt, erst besprechen, dann in `story/rooms/NAME.properties` schreiben, steht als TODO in `Ideen.md`), (b) Hilfe-Befehl im Spiel, (c) Feinschliff-Liste aus dem Durchspielen. Beim Start nach dem Thema fragen.
 
-**Farben (erledigt):** `game.Ansi` färbt Raumname, Rahmen, Menünummern, Erfolg, Schaden, Funde, Zauber, RK und Nebensächliches. Standardmäßig aus (Tests unverändert), `Main` schaltet ein und stellt die Ausgabe auf UTF-8, `--plain` schaltet ab. Die nebeneinander stehenden Klassenkarten sind nicht eingefärbt (Auffüllen mit `String.format` zählt die Farbcodes mit). Start im IntelliJ-Terminal: `java -cp target/classes game.Main` nach Build Project. Alle Bilder (Titel, Magier, Schurke, Tor) werden über `game.ArtPainter` eingefärbt, die Klassenkarten sind jetzt auch farbig (`Ansi.padRight` füllt nach sichtbarer Länge auf). `tools/AnsiDemo.java` blättert mit Enter durch die Bilder (`java -cp target/classes tools/AnsiDemo.java` nach Build Project). **Raumbilder:** Jeder Raum (Raum 0, acht Vorlagen, Thronsaal) hat ein Bild in `ascii/` (`gate`, `library`, `crypt`, `statue_hall`, `trap_corridor`, `alchemy_lab`, `prison`, `cistern`, `armory`, `throne`), verknüpft über `extra.art=NAME` in der Raumdatei und angezeigt in `Game.chooseAction` unter der Raumüberschrift. Alle Bilder stehen in der Demo. Die Bilder sind mit einem Hilfsskript erzeugt (Spiegelung für die Symmetrie), danach von Hand weiter anpassbar. Arbeit liegt auf dem Branch `raumbilder`, noch nicht in `main`. Mögliche nächste Schritte: Bilder nach Autor-Rückmeldung nachbessern, Hilfe-Befehl, Raum-Durchgang (Charakter). 206 Tests grün.
+**Entscheidungen der Sitzung zu Farben und Bildern:** Text farbig, Artwork ASCII (eingefärbt). Raumbilder erscheinen nur beim Betreten des Raums (`Game.showArt`), nicht in jedem Menü. Keine Raumbild-Details passend zu den Untersuchen-Stellen (erstmal nicht). Die Bilder sehen laut Autor gut aus.
+
+**Farben (erledigt):** `game.Ansi` färbt Raumname, Rahmen, Menünummern, Erfolg, Schaden, Funde, Zauber, RK und Nebensächliches. Standardmäßig aus (Tests unverändert), `Main` schaltet ein und stellt die Ausgabe auf UTF-8, `--plain` schaltet ab. Die nebeneinander stehenden Klassenkarten sind nicht eingefärbt (Auffüllen mit `String.format` zählt die Farbcodes mit). Start im IntelliJ-Terminal: `java -cp target/classes game.Main` nach Build Project. Alle Bilder (Titel, Magier, Schurke, Tor) werden über `game.ArtPainter` eingefärbt, die Klassenkarten sind jetzt auch farbig (`Ansi.padRight` füllt nach sichtbarer Länge auf). `tools/AnsiDemo.java` blättert mit Enter durch die Bilder (`java -cp target/classes tools/AnsiDemo.java` nach Build Project). **Raumbilder:** Jeder Raum (Raum 0, acht Vorlagen, Thronsaal) hat ein Bild in `ascii/` (`gate`, `library`, `crypt`, `statue_hall`, `trap_corridor`, `alchemy_lab`, `prison`, `cistern`, `armory`, `throne`), verknüpft über `extra.art=NAME` in der Raumdatei und angezeigt in `Game.chooseAction` unter der Raumüberschrift, nur beim Betreten. Alle Bilder stehen in der Demo. Die Bilder sind mit einem Hilfsskript erzeugt (Spiegelung für die Symmetrie, Skript lag im Scratchpad und ist nicht im Repository), danach von Hand weiter anpassbar (reine Textdateien in `src/main/resources/ascii/`, höchstens 56 Zeichen breit, 12 Zeilen, nur ASCII). 206 Tests grün.
 
 **Umgebung auf diesem Rechner (Stand Sitzung zu Farben):** Benutzer `PC`, Projektordner `C:\wi26\Strukturiertes Programmieren\BWISTPRO\DungeonCrawler`, JDK `C:\Java\jdk-26`, Maven von IntelliJ unter `C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd` (`JAVA_HOME` auf das JDK setzen). Die Pfade im Abschnitt 3 oben stammen vom alten Rechner.
 
@@ -168,7 +173,7 @@ Offene Rückfragen an den Autor aus der letzten Sitzung: Texte und Ton passen? R
 
 ## 10. Checkliste für den Abschluss jeder Sitzung
 
-1. Tests laufen lassen (201 müssen grün sein).
+1. Tests laufen lassen (aktuell 206 müssen grün sein).
 2. `Ideen.md` (Entscheidungen), `features.md` (Häkchen), `manual.md` (falls sich die Bedienung ändert), diese Datei und `PromptDiary.md` aktualisieren.
 3. Auf Ansage committen und `main` pushen, danach lokal und auf GitHub vergleichen (`git rev-parse HEAD`, `git rev-parse origin/main`).
 4. Offene Fragen als nummerierte Liste ans Ende der Antwort.

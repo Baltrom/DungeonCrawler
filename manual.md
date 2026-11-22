@@ -88,7 +88,7 @@ Der Dungeon wird bei jedem neuen Spiel zufällig erzeugt. Du beginnst in **Raum 
 
 ### Der Bildschirm
 
-Jeder Bildschirm zeigt: Raumname und Beschreibung, deine Werte (Lebenspunkte, Rüstungsklasse, bei Magiern die Zauberladungen), dein Inventar und die Auswahl.
+Beim Betreten eines Raums erscheint zuerst ein farbiges Bild des Raums (nur dieses eine Mal, danach bleibt mehr Platz für den Text). Jeder Bildschirm zeigt: Raumname und Beschreibung, deine Werte (Lebenspunkte, Rüstungsklasse, bei Magiern die Zauberladungen), dein Inventar und die Auswahl.
 
 ### Im Raum: Dinge untersuchen
 
