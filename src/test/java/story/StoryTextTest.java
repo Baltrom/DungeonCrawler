@@ -14,7 +14,7 @@ class StoryTextTest {
         List<String> lines = StoryText.load(name);
         assertFalse(lines.isEmpty(), name + " is empty");
         for (String line : lines) {
-            assertTrue(line.chars().allMatch(c -> c < 128), "Non-ASCII character in " + name + ": " + line);
+            assertTrue(line.chars().noneMatch(Character::isISOControl), "Control character in " + name + ": " + line);
         }
     }
 

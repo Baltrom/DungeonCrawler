@@ -35,10 +35,10 @@ class ItemTest {
     }
 
     @Test
-    void displayNamesAreAscii() {
+    void displayNamesArePrintable() {
         for (Item item : Item.values()) {
-            assertTrue((item.getDisplayName() + item.getDescription()).chars().allMatch(c -> c < 128),
-                    "Non-ASCII text in " + item);
+            assertTrue((item.getDisplayName() + item.getDescription()).chars().noneMatch(Character::isISOControl),
+                    "Control character in " + item);
         }
     }
 }

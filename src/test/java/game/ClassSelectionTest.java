@@ -91,6 +91,7 @@ class ClassSelectionTest {
         assertTrue(text.contains("SCHURKE"));
         assertTrue(text.contains("Lebenspunkte"));
         assertTrue(text.contains("Bist du sicher?"));
-        assertTrue(text.chars().allMatch(c -> c < 128), "Output contains non-ASCII characters");
+        assertTrue(text.chars().noneMatch(c -> Character.isISOControl(c) && c != '\n' && c != '\r' && c != 27),
+                "Output contains control characters");
     }
 }

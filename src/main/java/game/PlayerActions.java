@@ -40,10 +40,10 @@ class PlayerActions {
         io.println();
         io.println("Welchen Trank trinkst du?");
         for (int i = 0; i < options.size(); i++) {
-            io.println("[" + (i + 1) + "] " + options.get(i).getDisplayName()
+            io.println(Ansi.number(i + 1) + " " + options.get(i).getDisplayName()
                     + " - " + options.get(i).getDescription());
         }
-        io.println("[" + (options.size() + 1) + "] Zurueck");
+        io.println(Ansi.number(options.size() + 1) + " Zurueck");
         int choice = io.askChoice("Deine Wahl: ", 1, options.size() + 1);
         if (choice > options.size()) {
             return false;
@@ -53,11 +53,11 @@ class PlayerActions {
         player.drink(potion);
         if (potion == Item.HEALING_POTION) {
             io.report(flavour.pick("potion.heal"));
-            io.report("Du trinkst den Heiltrank und heilst " + (player.getCurrentHp() - hpBefore)
-                    + " Lebenspunkte.");
+            io.report(Ansi.gold("Du trinkst den Heiltrank und heilst " + (player.getCurrentHp() - hpBefore)
+                    + " Lebenspunkte."));
         } else {
             io.report(flavour.pick("potion.charge"));
-            io.report("Du trinkst den Ladungstrank. Deine Zauberladungen sind wieder voll.");
+            io.report(Ansi.blue("Du trinkst den Ladungstrank. Deine Zauberladungen sind wieder voll."));
         }
         return true;
     }
@@ -77,10 +77,10 @@ class PlayerActions {
         io.println();
         io.println("Welchen Zauber wirkst du? (Ladungen: " + player.getSpellCharges() + ")");
         for (int i = 0; i < options.size(); i++) {
-            io.println("[" + (i + 1) + "] " + options.get(i).getDisplayName()
+            io.println(Ansi.number(i + 1) + " " + Ansi.blue(options.get(i).getDisplayName())
                     + " - " + options.get(i).getDescription());
         }
-        io.println("[" + (options.size() + 1) + "] Zurueck");
+        io.println(Ansi.number(options.size() + 1) + " Zurueck");
         int choice = io.askChoice("Deine Wahl: ", 1, options.size() + 1);
         if (choice > options.size()) {
             return null;
@@ -95,10 +95,10 @@ class PlayerActions {
         StringBuilder stats = new StringBuilder();
         stats.append(player.getName()).append(" der ").append(player.getCharacterClass().getDisplayName());
         stats.append(" | HP ").append(player.getCurrentHp()).append("/").append(player.getMaxHp());
-        stats.append(" | RK ").append(player.getArmorClass());
+        stats.append(" | RK ").append(Ansi.cyan(String.valueOf(player.getArmorClass())));
         if (player.hasSpells()) {
-            stats.append(" | Ladungen ").append(player.getSpellCharges()).append("/")
-                    .append(player.getCharacterClass().getSpellCharges());
+            stats.append(" | Ladungen ").append(Ansi.blue(player.getSpellCharges() + "/"
+                    + player.getCharacterClass().getSpellCharges()));
         }
         lines.add(stats.toString());
         String items = player.getItems().isEmpty() ? "leer"

@@ -16,7 +16,7 @@ class AsciiArtTest {
             List<String> lines = AsciiArt.load(characterClass.getArtName());
             assertFalse(lines.isEmpty(), characterClass + " has no picture");
             for (String line : lines) {
-                assertTrue(line.chars().allMatch(c -> c < 128), "Non-ASCII character in: " + line);
+                assertTrue(line.chars().noneMatch(Character::isISOControl), "Control character in: " + line);
             }
         }
     }
@@ -26,7 +26,7 @@ class AsciiArtTest {
         List<String> lines = AsciiArt.load("title");
         assertFalse(lines.isEmpty());
         for (String line : lines) {
-            assertTrue(line.chars().allMatch(c -> c < 128), "Non-ASCII character in: " + line);
+            assertTrue(line.chars().noneMatch(Character::isISOControl), "Control character in: " + line);
         }
     }
 

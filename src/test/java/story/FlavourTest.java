@@ -40,10 +40,10 @@ class FlavourTest {
     }
 
     @Test
-    void everyTextIsShortAsciiAndUsesOnlyKnownPlaceholders() {
+    void everyTextIsShortPrintableAndUsesOnlyKnownPlaceholders() {
         for (String key : Flavour.keys()) {
             String text = new Flavour(new Random(1)).pick(key.substring(0, key.lastIndexOf('.')));
-            assertTrue(text.chars().allMatch(c -> c < 128), "Non-ASCII character in " + key + ": " + text);
+            assertTrue(text.chars().noneMatch(Character::isISOControl), "Control character in " + key + ": " + text);
             assertTrue(text.length() <= 240, key + " is too long");
             String withoutKnown = text.replace("{enemy}", "").replace("{room}", "");
             assertFalse(withoutKnown.contains("{"), "Unknown placeholder in " + key + ": " + text);

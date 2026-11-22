@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import save.SaveGame;
 import save.SaveManager;
+import story.AsciiArt;
 import story.Flavour;
 import story.StoryText;
 
@@ -56,6 +57,7 @@ public class Game {
     private boolean arcaneSight;
     private String header = "";
     private List<String> description = List.of();
+    private String artName;
 
     /** Neues Spiel: beginnt mit der Einleitung in Raum 0. */
     public Game(ConsoleIO io, Dice dice, Player player, Dungeon dungeon, SaveManager saveManager) {
@@ -112,7 +114,7 @@ public class Game {
 
     private void showIntro() {
         io.clearScreen();
-        io.println(LINE);
+        io.println(Ansi.gold(LINE));
         for (String line : StoryText.load("intro_" + player.getCharacterClass().getArtName())) {
             io.println(line);
         }
@@ -128,6 +130,7 @@ public class Game {
         RoomScript script = room.script();
         header = "RAUM " + room.index() + " - " + script.name();
         description = script.description();
+        artName = script.extra().get("art");
 
         if (room.kind() == RoomKind.BOSS) {
             return playBossRoom(room, script);
@@ -246,7 +249,7 @@ public class Game {
         if (def.failureDamage()) {
             int damage = dice.roll(INTERACTION_TRAP_DIE);
             player.takeDamage(damage);
-            io.report("Du nimmst " + damage + " Schaden (1W" + INTERACTION_TRAP_DIE + ").");
+            io.report(Ansi.red("Du nimmst " + damage + " Schaden (1W" + INTERACTION_TRAP_DIE + ")."));
             if (!player.isAlive()) {
                 io.report(flavour.pick("trap.dead"));
                 return RoomResult.DEAD;
@@ -316,14 +319,15 @@ public class Game {
             progress.insightBonus = 0;
         }
         CheckResult result = SkillCheck.roll(dice, bonus, target);
-        io.report(result.describe(label));
+        String line = result.describe(label);
+        io.report(result.success() ? Ansi.green(line) : line);
         return result;
     }
 
     /** Nimmt ein Item auf. Ist das Inventar voll, entscheidet der Spieler, was weg soll. */
     void receiveItem(Item item) {
         io.report(flavour.pick("item.found." + item.name()));
-        io.report("Du findest: " + item.getDisplayName() + " (" + item.getDescription() + ")");
+        io.report(Ansi.gold("Du findest: " + item.getDisplayName() + " (" + item.getDescription() + ")"));
         if (player.addItem(item)) {
             io.report(item.getDisplayName() + " kommt in dein Inventar.");
             return;
@@ -332,10 +336,10 @@ public class Game {
                 + "). Was soll weg?");
         List<Item> items = List.copyOf(player.getItems());
         for (int i = 0; i < items.size(); i++) {
-            io.println("[" + (i + 1) + "] " + items.get(i).getDisplayName() + " wegwerfen");
+            io.println(Ansi.number(i + 1) + " " + items.get(i).getDisplayName() + " wegwerfen");
         }
         int leave = items.size() + 1;
-        io.println("[" + leave + "] " + item.getDisplayName() + " liegen lassen");
+        io.println(Ansi.number(leave) + " " + item.getDisplayName() + " liegen lassen");
         int choice = io.askChoice("Deine Wahl: ", 1, leave);
         if (choice == leave) {
             io.report("Du laesst " + item.getDisplayName() + " liegen.");
@@ -366,7 +370,7 @@ public class Game {
         }
         player.takeDamage(damage);
         io.report(flavour.pick(fumble ? "trap.fumble" : "trap.hit"));
-        io.report("Du nimmst " + damage + " Schaden (" + diceCount + "W6).");
+        io.report(Ansi.red("Du nimmst " + damage + " Schaden (" + diceCount + "W6)."));
         if (!player.isAlive()) {
             io.report(flavour.pick("trap.dead"));
             return RoomResult.DEAD;
@@ -465,11 +469,16 @@ public class Game {
     int chooseAction(String title, List<String> labels, List<String> sceneLines) {
         while (true) {
             io.clearScreenOnly();
-            io.println(LINE);
-            io.println(header);
-            io.println(LINE);
+            io.println(Ansi.gold(LINE));
+            io.println(Ansi.gold(header));
+            io.println(Ansi.gold(LINE));
+            if (artName != null) {
+                for (String line : ArtPainter.paint(artName, AsciiArt.load(artName))) {
+                    io.println(line);
+                }
+            }
             for (String line : description) {
-                io.println(line);
+                io.println(Ansi.grey(line));
             }
             for (String line : sceneLines) {
                 io.println(line);
@@ -488,18 +497,18 @@ public class Game {
             io.println();
             io.println(title);
             for (int i = 0; i < labels.size(); i++) {
-                io.println("[" + (i + 1) + "] " + labels.get(i));
+                io.println(Ansi.number(i + 1) + " " + labels.get(i));
             }
             int next = labels.size() + 1;
             int potionNumber = -1;
             int spellNumber = -1;
             if (actions.canDrinkAnything()) {
                 potionNumber = next++;
-                io.println("[" + potionNumber + "] Trank trinken");
+                io.println(Ansi.number(potionNumber) + " Trank trinken");
             }
             if (player.hasSpells()) {
                 spellNumber = next++;
-                io.println("[" + spellNumber + "] Zauber wirken");
+                io.println(Ansi.number(spellNumber) + " " + Ansi.blue("Zauber wirken"));
             }
             int choice = io.askChoice("Deine Wahl: ", 1, next - 1);
             if (choice <= labels.size()) {
@@ -522,7 +531,7 @@ public class Game {
         if (spell == Spell.ARCANE_SIGHT) {
             arcaneSight = true;
             io.report(flavour.pick("spell.arcane"));
-            io.report("Dein naechster Intelligenz-Check bekommt +" + Spell.ARCANE_SIGHT_BONUS + ".");
+            io.report(Ansi.blue("Dein naechster Intelligenz-Check bekommt +" + Spell.ARCANE_SIGHT_BONUS + "."));
         }
     }
 

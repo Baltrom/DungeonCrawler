@@ -35,9 +35,9 @@ public class ClassSelection {
     private CharacterClass chooseClass() {
         CharacterClass[] classes = CharacterClass.values();
         io.clearScreen();
-        io.println(SCREEN_LINE);
-        io.println(center("WAEHLE DEINE KLASSE", SCREEN_WIDTH));
-        io.println(SCREEN_LINE);
+        io.println(Ansi.gold(SCREEN_LINE));
+        io.println(Ansi.gold(center("WAEHLE DEINE KLASSE", SCREEN_WIDTH)));
+        io.println(Ansi.gold(SCREEN_LINE));
 
         List<List<String>> columns = new ArrayList<>();
         for (CharacterClass characterClass : classes) {
@@ -51,7 +51,7 @@ public class ClassSelection {
                 card.add("");
             }
             card.add("");
-            card.add("[" + (i + 1) + "] " + classes[i].getDisplayName());
+            card.add(Ansi.number(i + 1) + " " + classes[i].getDisplayName());
         }
         printSideBySide(columns);
 
@@ -67,17 +67,17 @@ public class ClassSelection {
         }
         io.println();
         io.println("Bist du sicher? Du waehlst: " + chosen.getDisplayName());
-        io.println("[1] Ja");
-        io.println("[2] Nein, zurueck zur Auswahl");
+        io.println(Ansi.number(1) + " Ja");
+        io.println(Ansi.number(2) + " Nein, zurueck zur Auswahl");
         io.println();
         return io.askChoice("Deine Wahl: ", 1, 2) == 1;
     }
 
     private String askName() {
         io.clearScreen();
-        io.println(SCREEN_LINE);
-        io.println(center("WIE HEISST DEIN CHARAKTER?", SCREEN_WIDTH));
-        io.println(SCREEN_LINE);
+        io.println(Ansi.gold(SCREEN_LINE));
+        io.println(Ansi.gold(center("WIE HEISST DEIN CHARAKTER?", SCREEN_WIDTH)));
+        io.println(Ansi.gold(SCREEN_LINE));
         io.println("1 bis " + PlayerName.MAX_LENGTH + " Zeichen, nur Buchstaben und Zahlen, keine Leerzeichen.");
         io.println();
         while (true) {
@@ -93,25 +93,25 @@ public class ClassSelection {
     /** Eine Karte als Liste von Zeilen, jede hoechstens CARD_WIDTH Zeichen breit. */
     private List<String> cardLines(CharacterClass characterClass) {
         List<String> lines = new ArrayList<>();
-        lines.add(CARD_LINE);
-        lines.add(characterClass.getDisplayName().toUpperCase());
-        lines.add(CARD_LINE);
-        lines.addAll(AsciiArt.load(characterClass.getArtName()));
+        lines.add(Ansi.gold(CARD_LINE));
+        lines.add(Ansi.gold(characterClass.getDisplayName().toUpperCase()));
+        lines.add(Ansi.gold(CARD_LINE));
+        lines.addAll(ArtPainter.paint(characterClass.getArtName(), AsciiArt.load(characterClass.getArtName())));
         lines.add("");
         lines.add(attributeLine("Staerke", characterClass.getStrength()));
         lines.add(attributeLine("Geschick", characterClass.getDexterity()));
         lines.add(attributeLine("Intelligenz", characterClass.getIntelligence()));
-        lines.add(String.format("%-13s%d", "Lebenspunkte", characterClass.getMaxHp()));
-        lines.add(String.format("%-13s%d", "Ruestungskl.", characterClass.getArmorClass()));
-        lines.add("Faehigkeiten:");
+        lines.add(String.format("%-13s", "Lebenspunkte") + Ansi.red(String.valueOf(characterClass.getMaxHp())));
+        lines.add(String.format("%-13s", "Ruestungskl.") + Ansi.cyan(String.valueOf(characterClass.getArmorClass())));
+        lines.add(Ansi.grey("Faehigkeiten:"));
         lines.addAll(wrap(characterClass.getDescription(), CARD_WIDTH, "  "));
         return lines;
     }
 
     private String attributeLine(String label, int value) {
         int filled = Math.min(value, MAX_ATTRIBUTE_BAR);
-        String bar = "#".repeat(filled) + ".".repeat(MAX_ATTRIBUTE_BAR - filled);
-        return String.format("%-13s%s %d", label, bar, value);
+        String bar = Ansi.gold("#".repeat(filled)) + Ansi.grey(".".repeat(MAX_ATTRIBUTE_BAR - filled));
+        return String.format("%-13s", label) + bar + " " + value;
     }
 
     private void printSideBySide(List<List<String>> columns) {
@@ -124,7 +124,7 @@ public class ClassSelection {
                 if (col > 0) {
                     line.append(" ".repeat(COLUMN_GAP));
                 }
-                line.append(String.format("%-" + CARD_WIDTH + "s", text));
+                line.append(Ansi.padRight(text, CARD_WIDTH));
             }
             io.println(line.toString().stripTrailing());
         }

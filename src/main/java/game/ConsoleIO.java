@@ -47,11 +47,11 @@ public class ConsoleIO {
     /** Gibt den Block "Was zuletzt geschah" aus (falls es Ergebnisse gibt) und vergisst sie dann. */
     public void showRecentResults() {
         if (!recentResults.isEmpty()) {
-            out.println("--- Was zuletzt geschah ---");
+            out.println(Ansi.grey("--- Was zuletzt geschah ---"));
             for (String line : recentResults) {
                 out.println(line);
             }
-            out.println("---------------------------");
+            out.println(Ansi.grey("---------------------------"));
             out.println();
             recentResults.clear();
         }

@@ -4,11 +4,21 @@ Ein textbasiertes Abenteuer in der Gruft eines toten Königs. Du wählst eine Kl
 
 ## 1. Starten
 
-**In IntelliJ (empfohlen):**
+**In IntelliJ, im Terminal-Tab (empfohlen, nur so sieht man Farben und Zeichen richtig):**
 1. Projektordner öffnen. Beim ersten Mal rechts oben im Editor oder an der `pom.xml` **„Load Maven Project“** klicken, damit die Testbibliothek geladen wird.
-2. `src/main/java/game/Main.java` öffnen.
-3. Den grünen Pfeil neben `public static void main` klicken und **Run 'Main.main()'** wählen.
-4. Unten im Fenster **Run** in die Konsole klicken und die Eingaben tippen.
+2. Das Projekt übersetzen: **Build → Build Project** (Strg+F9). Danach liegen die Klassen in `target/classes`.
+3. Unten auf das Tab **Terminal** klicken (der Ordner ist schon der Projektordner).
+4. Eingeben: `java -cp target/classes game.Main` und Enter drücken. Mit `java -cp target/classes game.Main --plain` startet das Spiel ohne Farben.
+5. Im Terminal Zahlen tippen und mit Enter bestätigen.
+
+**Einstellungen in IntelliJ (nur falls Umlaute, Rahmen oder Farben falsch aussehen):**
+- **Zeilenabstand:** *Settings → Editor → Color Scheme → Console Font*: „Line spacing“ auf **1.0** stellen. Sonst entstehen Lücken zwischen den Zeilen der Bilder.
+- **Schrift:** Eine Schrift mit fester Breite verwenden (z. B. JetBrains Mono, die Standardschrift), damit die Bilder gerade stehen.
+- **Codierung:** *Settings → Editor → File Encodings*: „Global Encoding“ und „Project Encoding“ auf **UTF-8**. Das Spiel stellt seine Ausgabe selbst auf UTF-8 um.
+- **Terminal-Farben:** *Settings → Tools → Terminal* muss die Farbausgabe nicht extra einschalten, sie ist Standard. Wenn nur Zeichenmüll wie `[38;2;255m` erscheint, startet das Spiel nicht im Terminal-Tab, sondern in der Run-Konsole.
+- Die **Run-Konsole** (grüner Pfeil neben `main`) funktioniert zum Testen, zeigt aber je nach Einstellung keine Truecolor-Farben oder falsche Zeichen. Dort am besten `--plain` als *Program arguments* eintragen (*Run → Edit Configurations*).
+
+**Auf einem anderen Rechner:** Windows Terminal oder ein anderes Terminal mit Truecolor-Unterstützung genügt. Im Projektordner mit `mvn compile` übersetzen und dann `java -cp target/classes game.Main` starten.
 
 **Tests ausführen:** In IntelliJ Rechtsklick auf `src/test/java` und **Run All Tests**, oder mit Maven `mvn test`.
 
@@ -22,7 +32,7 @@ Beim Spielen entstehen im Arbeitsordner zwei Dateien: `savegame.txt` (Spielstand
 - Eine ungültige Eingabe wird einfach erneut abgefragt („Bitte eine Zahl von 1 bis 4 eingeben.“).
 - Vor jedem neuen Bildschirm werden viele Leerzeilen ausgegeben, damit der alte Text aus dem Blick verschwindet. Du kannst nach oben scrollen, wenn du etwas nachlesen willst.
 - Auf jedem neuen Bildschirm steht oben der Raum mit Beschreibung, direkt darunter der Block **„Was zuletzt geschah“**: Würfe, Treffer, Funde und Texte deiner letzten Aktion. Im Kampf steht er unter der Kampf-Überschrift.
-- Es gibt keine Sonderzeichen und keine Umlaute in der Ausgabe (ae, oe, ue), damit die Windows-Konsole nichts verstümmelt.
+- Die Ausgabe ist farbig (Gold für Raumnamen und Menünummern, Grün für Erfolge, Rot für Schaden, Blau für Zauber, Cyan für die Rüstungsklasse, Grau für Nebensächliches). Dafür muss das Spiel im **Terminal-Tab** von IntelliJ gestartet werden (siehe Abschnitt 1). Die Bilder bestehen nur aus ASCII-Zeichen, die Story-Texte noch aus ae/oe/ue statt Umlauten.
 
 ## 3. Hauptmenü
 
@@ -197,5 +207,7 @@ Du kannst **5 Items** tragen. Jedes Item belegt einen Platz, auch Tränke und Sc
 |---|---|
 | Der grüne Pfeil fehlt | Maven-Projekt laden: Rechtsklick auf `pom.xml`, Maven, Reload project |
 | „Der Spielstand ist beschaedigt“ | Der Spielstand stammt aus einer älteren Version. `savegame.txt` im Projektordner löschen |
-| Sonderzeichen in der Konsole | Das Spiel gibt nur ASCII aus. Die Dateien sollten als UTF-8 gespeichert sein |
+| Zeichenmüll wie `[38;2;255m` | Das Spiel läuft nicht im Terminal-Tab. Dort starten (Abschnitt 1) oder mit `--plain` ohne Farben |
+| Lücken zwischen den Zeilen der Bilder | Zeilenabstand der Konsolenschrift auf 1.0 stellen (Abschnitt 1) |
+| Umlaute oder Rahmen falsch | Codierung auf UTF-8 stellen und im Terminal-Tab starten (Abschnitt 1) |
 | Rangliste zurücksetzen | `highscores.txt` im Arbeitsordner löschen |

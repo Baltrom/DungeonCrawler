@@ -210,6 +210,7 @@ class MainMenuTest {
         highscores().add(new HighscoreEntry("Bob", CharacterClass.ROGUE, 4));
         launcher.result = new GameResult(GameOutcome.DEATH, 1);
         runWithInput("3", "", "1", "2", "1", "Bob", "", "2", "", "4");
-        assertTrue(printed().chars().allMatch(c -> c < 128), "Output contains non-ASCII characters");
+        assertTrue(printed().chars().noneMatch(c -> Character.isISOControl(c) && c != '\n' && c != '\r' && c != 27),
+                "Output contains control characters");
     }
 }

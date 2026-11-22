@@ -17,7 +17,7 @@
 
 ## 2. Wie der Autor arbeiten will (wichtig)
 
-- **Sprache:** Deutsch. Code-Bezeichner Englisch, Story-Texte und Doku Deutsch. Konsolenausgabe nur ASCII (ae/oe/ue/ss).
+- **Sprache:** Deutsch. Code-Bezeichner Englisch, Story-Texte und Doku Deutsch. Text darf ANSI-Farben haben (über `game.Ansi`, im Terminal-Tab von IntelliJ gestartet), das **Artwork bleibt ASCII** und wird nur eingefärbt (Block- und Schattierungszeichen sahen im Terminal schlecht aus, siehe `agents.md`). Bestehende Texte sind noch ae/oe/ue statt Umlauten.
 - **Erst besprechen, dann bauen.** Entscheidungen werden im Gespräch getroffen und in `Ideen.md` festgehalten. Bei größeren Änderungen an der Struktur vorher fragen.
 - **Offene Fragen immer als nummerierte Liste am Ende der Antwort.** (Ausdrücklicher Wunsch des Autors.)
 - **Kurze Entscheidungen** gibt der Autor als Liste („1 passt, 2 nein, …“). Darauf einzeln antworten.
@@ -121,7 +121,7 @@ Gegner (HP/RK/Trefferbonus, Schaden immer D6): Skelett 6/9/+1, Gargoyle 10/11/+2
 201 JUnit-Tests (JUnit 5), alle grün. Wichtige Hilfen in `src/test/java/dice/`: `FixedDice` (feste Würfelfolge), `MaxDice` (immer die höchste Zahl). Besondere Tests:
 - `RandomPlaythroughTest`: 400 Spiele mit zufälligen Eingaben, prüft Abstürze und Endlosschleifen, dazu Speichern und Weiterspielen.
 - `GameTest`: Räume, Fallen, Interaktionen, Hinweise, Speichern, ein kompletter Durchlauf bis zum Sieg (Schurke mit `MaxDice`).
-- `RoomScriptTest`, `FlavourTest`: Vollständigkeit, ASCII, Länge der Texte.
+- `RoomScriptTest`, `FlavourTest`: Vollständigkeit, keine Steuerzeichen, Länge der Texte.
 
 Menünummern in Tests ändern sich, sobald ein Menüpunkt dazukommt. Die Tests rechnen die Nummern im Kommentar vor (z. B. Raum 0 als Magier: Runen 1, Innehalten 2, Fußspuren 3, Tor 4, Speichern 5, Zauber 6).
 
@@ -147,6 +147,10 @@ Die Werte (Gegner, Falle, Lebenspunkte) stehen in der Datei als Zahlen und müss
 ## 9. Wie es weitergeht (offen)
 
 **Aktuell (Sitzung nach V1):** Der Autor will **jeden einzelnen Raum mit ihm durchgehen und ihm Charakter geben** (Raum 0, acht Vorlagen, Thronsaal), danach die Räume **personalisieren**. Ein Raum pro Schritt, erst besprechen, dann in `story/rooms/NAME.properties` schreiben. Steht als TODO in `Ideen.md`.
+
+**Farben (erledigt):** `game.Ansi` färbt Raumname, Rahmen, Menünummern, Erfolg, Schaden, Funde, Zauber, RK und Nebensächliches. Standardmäßig aus (Tests unverändert), `Main` schaltet ein und stellt die Ausgabe auf UTF-8, `--plain` schaltet ab. Die nebeneinander stehenden Klassenkarten sind nicht eingefärbt (Auffüllen mit `String.format` zählt die Farbcodes mit). Start im IntelliJ-Terminal: `java -cp target/classes game.Main` nach Build Project. Alle Bilder (Titel, Magier, Schurke, Tor) werden über `game.ArtPainter` eingefärbt, die Klassenkarten sind jetzt auch farbig (`Ansi.padRight` füllt nach sichtbarer Länge auf). `tools/AnsiDemo.java` blättert mit Enter durch die Bilder (`java -cp target/classes tools/AnsiDemo.java` nach Build Project). **Raumbilder:** Jeder Raum (Raum 0, acht Vorlagen, Thronsaal) hat ein Bild in `ascii/` (`gate`, `library`, `crypt`, `statue_hall`, `trap_corridor`, `alchemy_lab`, `prison`, `cistern`, `armory`, `throne`), verknüpft über `extra.art=NAME` in der Raumdatei und angezeigt in `Game.chooseAction` unter der Raumüberschrift. Alle Bilder stehen in der Demo. Die Bilder sind mit einem Hilfsskript erzeugt (Spiegelung für die Symmetrie), danach von Hand weiter anpassbar. Arbeit liegt auf dem Branch `raumbilder`, noch nicht in `main`. Mögliche nächste Schritte: Bilder nach Autor-Rückmeldung nachbessern, Hilfe-Befehl, Raum-Durchgang (Charakter). 206 Tests grün.
+
+**Umgebung auf diesem Rechner (Stand Sitzung zu Farben):** Benutzer `PC`, Projektordner `C:\wi26\Strukturiertes Programmieren\BWISTPRO\DungeonCrawler`, JDK `C:\Java\jdk-26`, Maven von IntelliJ unter `C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd` (`JAVA_HOME` auf das JDK setzen). Die Pfade im Abschnitt 3 oben stammen vom alten Rechner.
 
 **Schon erledigt in dieser Sitzung:** Die Anzeige ist umgedreht. Jeder Bildschirm zeigt zuerst Raumname und Beschreibung, darunter „Was zuletzt geschah“, dann Status und Auswahl. Technisch: `ConsoleIO.clearScreenOnly()` + `showRecentResults()` (in `Game.chooseAction` und `Combat.playerTurn`); `clearScreen()` zeigt die Ergebnisse weiter direkt nach dem Leeren (Hauptmenü usw.). 202 Tests grün.
 

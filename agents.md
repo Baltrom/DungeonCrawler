@@ -17,7 +17,11 @@ Am Ende jeder Sitzung `Uebergabe.md`, `PromptDiary.md`, `Ideen.md` und `features
 - Einfach und lesbar halten, das Projekt ist ein Studienprojekt (Einführung Software Engineering).
 - Nur das umsetzen, was gefragt ist. Keine ungefragten Refactorings oder neuen Abhängigkeiten.
 - Vor größeren Änderungen an der Struktur kurz nachfragen.
-- Konsolenausgabe nur in ASCII (ae/oe/ue statt Umlauten).
+- **Text darf ANSI-Farben haben, Artwork bleibt ASCII.** Die Ausgabe läuft in UTF-8 (`Main` stellt den `PrintStream` darauf um), gedacht für das Terminal-Tab in IntelliJ oder Windows Terminal, nicht für die Run-Konsole. Die ASCII-Bilder (`src/main/resources/ascii/`) bestehen nur aus ASCII-Zeichen (keine Block- oder Schattierungszeichen wie `░▒▓█`, keine Pixelbilder mit Hintergrundfarbe, das ergab Streifen und Muster im IntelliJ-Terminal). Sie dürfen eingefärbt werden. Die bestehenden Story-Texte bleiben vorerst ASCII (ae/oe/ue), bis sie bewusst auf Umlaute umgestellt werden.
+- Farben (ANSI, Truecolor) kommen nur über die Klasse `game.Ansi` (`Ansi.gold(...)`, `Ansi.number(n)` usw.), nie als rohe Escape-Codes im Spielcode. `Ansi` ist standardmäßig aus (Tests bleiben unverändert), `Main` schaltet sie ein, `--plain` als Programmargument schaltet sie ab. Palette: Raumname, Rahmenlinien und Menünummern Gold, Erfolg Grün, Schaden Rot, Heilung/Funde Gold, Zauber Blau, Rüstungsklasse Cyan, Nebensächliches (Beschreibung, „Was zuletzt geschah“) gedämpftes Grau. Texte mit Farbcodes nicht mit `String.format("%-20s")` auffüllen (die Codes zählen als Zeichen), daher sind die nebeneinander gesetzten Klassenkarten nicht eingefärbt.
+- Bilder werden über `game.ArtPainter` eingefärbt (Farbe pro Zeichen nach Bild, Zeile und Spalte, die Bilddateien bleiben reines ASCII). Neues Bild: Datei in `ascii/` anlegen, Farbregel in `ArtPainter.colorOf` ergänzen, Namen in `tools/AnsiDemo.java` in die Liste `IMAGES` eintragen.
+- Jeder Raum hat ein Bild (12 Zeilen, höchstens 56 Zeichen breit, nur ASCII). Welches, steht in der Raumdatei als `extra.art=NAME` (Datei `ascii/NAME.txt`). `Game.chooseAction` zeigt es unter der Raumüberschrift. Zeichenfarben der Raumbilder: `~` Wasser, `*` Flamme, `@` Gold, `o`/`O` Knochen, `#` Holz, `%` Gift, `=` `T` `^` Stahl, `&` Teppich (rot), `. , : ; v` dunkler Stein.
+- Bilder ansehen: `tools/AnsiDemo.java` blättert mit Enter durch alle Bilder (nach „Build Project“ im IntelliJ-Terminal: `java -cp target/classes tools/AnsiDemo.java`).
 - Story-Ton: düster (Gruft eines toten Königs). Raumvorlagen und Details stehen in `Ideen.md`.
 - Bildschirm „leeren“ nur über eine zentrale Methode `clearScreen()`, die viele Leerzeilen ausgibt.
 
@@ -36,7 +40,7 @@ Maven-Projekt (Java 21, JUnit 5). Pakete in `src/main/java`:
 - `combat` – Gegnerwerte (der Kampfablauf selbst ist `game.Combat`)
 - `dice` – `Dice`, zentrale Würfelklasse
 - `dungeon` – Raumvorlagen, Dungeon-Erzeugung aus dem Seed
-- `game` – Spielablauf (`Game`), Hauptmenü, Klassenauswahl, Konsolen-Ein-/Ausgabe
+- `game` – Spielablauf (`Game`), Hauptmenü, Klassenauswahl, Konsolen-Ein-/Ausgabe, `Ansi` (Farben)
 - `highscore` – Rangliste (Top 10), `save` – Spielstand
 - `item` – Items und Inventar
 - `story` – lädt ASCII-Bilder und Story-Texte aus `src/main/resources/` (`ascii/`, `story/`); `Flavour` wählt zufällig eine Textvariante
@@ -44,7 +48,7 @@ Maven-Projekt (Java 21, JUnit 5). Pakete in `src/main/java`:
 Räume und Texte:
 - Jede Raumvorlage ist eine Datei `src/main/resources/story/rooms/NAME.properties` (`RoomScript` liest sie). Dort stehen Beschreibung, Hindernis, Ansätze und die Dinge zum Untersuchen (`poi.N.*`, optional mit `follow`). Neue Räume oder Texte gehören in diese Dateien, nicht in den Code.
 - Allgemeine Texte (Kampf, Funde, Fallen, Hinweise) stehen in `story/flavour.properties` mit Varianten `key.1`, `key.2`, ...
-- Alle Texte nur in ASCII (ae/oe/ue/ss). Die Tests `RoomScriptTest` und `FlavourTest` prüfen, dass nichts fehlt und alles ASCII ist.
+- Texte dürfen Unicode enthalten, aber keine Steuerzeichen. Die Tests `RoomScriptTest` und `FlavourTest` prüfen, dass nichts fehlt und keine Steuerzeichen vorkommen.
 
 Zum Spielen `game.Main` starten. Beim Spielen entstehen `savegame.txt` und `highscores.txt` im Arbeitsordner (stehen in `.gitignore`).
 

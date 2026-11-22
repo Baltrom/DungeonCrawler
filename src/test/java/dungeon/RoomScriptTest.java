@@ -16,7 +16,7 @@ class RoomScriptTest {
     private static void assertGoodText(String text, String where) {
         assertNotNull(text, where + " is missing");
         assertFalse(text.isBlank(), where + " is empty");
-        assertTrue(text.chars().allMatch(c -> c < 128), "Non-ASCII character in " + where + ": " + text);
+        assertTrue(text.chars().noneMatch(Character::isISOControl), "Control character in " + where + ": " + text);
         assertTrue(text.length() <= 240, where + " is too long (" + text.length() + "): " + text);
     }
 

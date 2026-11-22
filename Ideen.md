@@ -138,7 +138,7 @@ Die Liste wird in späteren Versionen **größer**. Welches Item wo liegt, gehö
   3. Namen eingeben (1–15 Zeichen, Eingabe darf nicht leer sein, Buchstaben und Zahlen, keine Sonderzeichen, keine Leerzeichen)
   4. Spiel startet
 - Darstellung: ASCII-Figur der Klasse mit Attributwerten und Lebenspunkten.
-- Nur ASCII-Zeichen ausgeben (ae/oe/ue statt Umlauten), damit die Windows-Konsole nichts verstümmelt.
+- Artwork nur in ASCII. Texte bleiben vorerst ae/oe/ue statt Umlauten. **Geändert (Sitzung zu Farben):** Text darf ANSI-Farben haben (Terminal-Tab in IntelliJ, UTF-8), das Artwork bleibt ASCII und wird nur eingefärbt. Block- und Schattierungszeichen (`░▒▓█`) und Halbblöcke mit Hintergrundfarbe wurden im Terminal-Tab ausprobiert und sahen schlecht aus (Muster, Streifen), deshalb verworfen. Siehe `agents.md` und `tools/AnsiDemo.java`.
 
 ### Konsole „leeren“
 - Vor jedem neuen Bildschirm viele Leerzeilen ausgeben, damit der alte Text aus dem Sichtfeld verschwindet.

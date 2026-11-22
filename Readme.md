@@ -19,10 +19,18 @@ Ausführliche Bedienung: [manual.md](manual.md)
 ## Schnellstart
 
 1. Projekt in IntelliJ öffnen, Maven-Projekt laden („Load Maven Project“ an der `pom.xml`).
-2. `src/main/java/game/Main.java` starten (grüner Pfeil neben `main`).
-3. In der Konsole Zahlen eingeben und mit Enter bestätigen.
+2. Übersetzen: **Build → Build Project** (Strg+F9).
+3. Unten das **Terminal**-Tab öffnen und eingeben: `java -cp target/classes game.Main`
+4. Zahlen eingeben und mit Enter bestätigen.
 
-Voraussetzung: Java 21 oder neuer. Tests: `mvn test` oder in IntelliJ „Run All Tests“.
+Das Spiel ist farbig (ANSI) und braucht dafür das **Terminal-Tab**, nicht die Run-Konsole. Ohne Farben: `java -cp target/classes game.Main --plain`.
+
+**Einstellungen in IntelliJ, falls nötig:**
+- *Settings → Editor → Color Scheme → Console Font*: „Line spacing“ auf **1.0** (sonst Lücken im Bild).
+- Schrift mit fester Breite (Standard: JetBrains Mono).
+- *Settings → Editor → File Encodings*: Global und Project Encoding auf **UTF-8**.
+
+Voraussetzung: Java 21 oder neuer. Tests: `mvn test` oder in IntelliJ „Run All Tests“. Einzelheiten und Fehlersuche stehen in [manual.md](manual.md).
 
 ## Stand
 
@@ -43,7 +51,7 @@ src/main/java/
   save/        Spielstand
   story/       Laden von Bildern und Texten
 src/main/resources/
-  ascii/       ASCII-Bilder der Klassen und das Titelbild
+  ascii/       ASCII-Bilder der Klassen und das Titelbild (nur ASCII, Farbe kommt aus dem Code)
   story/       Intro- und Endtexte, Raumskripte (rooms/), Stimmungstexte
 src/test/java/ JUnit-Tests (über 200)
 ```

@@ -60,14 +60,14 @@ public class MainMenu {
 
     private void show() {
         io.clearScreen();
-        for (String line : AsciiArt.load("title")) {
+        for (String line : ArtPainter.paint("title", AsciiArt.load("title"))) {
             io.println(line);
         }
         io.println();
-        io.println("[" + NEW_GAME + "] Neues Spiel");
-        io.println("[" + LOAD_GAME + "] Spiel laden");
-        io.println("[" + HIGHSCORES + "] Rangliste anzeigen");
-        io.println("[" + QUIT + "] Beenden");
+        io.println(Ansi.number(NEW_GAME) + " Neues Spiel");
+        io.println(Ansi.number(LOAD_GAME) + " Spiel laden");
+        io.println(Ansi.number(HIGHSCORES) + " Rangliste anzeigen");
+        io.println(Ansi.number(QUIT) + " Beenden");
         io.println();
     }
 
@@ -100,19 +100,19 @@ public class MainMenu {
      */
     private void finishGame(String name, CharacterClass characterClass, GameResult result) {
         io.clearScreen();
-        io.println(LINE);
+        io.println(Ansi.gold(LINE));
         switch (result.outcome()) {
             case VICTORY -> {
-                io.println("SIEG");
+                io.println(Ansi.green("SIEG"));
                 StoryText.load("victory").forEach(io::println);
             }
             case DEATH -> {
-                io.println("DU BIST GESTORBEN");
+                io.println(Ansi.red("DU BIST GESTORBEN"));
                 StoryText.load("death").forEach(io::println);
             }
             case SAVED -> io.println("SPIEL GESPEICHERT");
         }
-        io.println(LINE);
+        io.println(Ansi.gold(LINE));
         io.println(name + " der " + characterClass.getDisplayName() + " erreichte Raum "
                 + result.roomsReached() + ".");
 
@@ -131,9 +131,9 @@ public class MainMenu {
     private void showHighscores() {
         List<HighscoreEntry> entries = highscores.load();
         io.clearScreen();
-        io.println(LINE);
-        io.println("RANGLISTE - Top " + Highscores.MAX_ENTRIES);
-        io.println(LINE);
+        io.println(Ansi.gold(LINE));
+        io.println(Ansi.gold("RANGLISTE - Top " + Highscores.MAX_ENTRIES));
+        io.println(Ansi.gold(LINE));
         if (entries.isEmpty()) {
             io.println("Noch keine Eintraege. Wer schafft es am weitesten in die Gruft?");
         }

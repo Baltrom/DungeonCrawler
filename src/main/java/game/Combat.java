@@ -91,9 +91,9 @@ class Combat {
         while (true) {
             // Der Bildschirm wird geleert, ganz oben stehen die Ergebnisse der letzten Zuege
             io.clearScreenOnly();
-            io.println(LINE);
-            io.println("KAMPF: " + enemy.name());
-            io.println(LINE);
+            io.println(Ansi.gold(LINE));
+            io.println(Ansi.gold("KAMPF: " + enemy.name()));
+            io.println(Ansi.gold(LINE));
             io.showRecentResults();
             for (String line : actions.statusLines()) {
                 io.println(line);
@@ -101,21 +101,21 @@ class Combat {
             io.println("Gegner: " + enemy.name() + " | HP " + enemyHp + "/" + enemy.maxHp()
                     + " | RK " + enemy.armorClass());
             if (shieldBonus > 0) {
-                io.println("Schutzschild aktiv (+" + shieldBonus + " Ruestungsklasse).");
+                io.println(Ansi.blue("Schutzschild aktiv (+" + shieldBonus + " Ruestungsklasse)."));
             }
             io.println();
             io.println("Dein Zug:");
-            io.println("[1] Angreifen");
+            io.println(Ansi.number(1) + " Angreifen");
             int next = 2;
             int potionNumber = -1;
             int spellNumber = -1;
             if (actions.canDrinkAnything()) {
                 potionNumber = next++;
-                io.println("[" + potionNumber + "] Trank trinken");
+                io.println(Ansi.number(potionNumber) + " Trank trinken");
             }
             if (player.hasSpells()) {
                 spellNumber = next++;
-                io.println("[" + spellNumber + "] Zauber wirken");
+                io.println(Ansi.number(spellNumber) + " " + Ansi.blue("Zauber wirken"));
             }
             int choice = io.askChoice("Deine Wahl: ", 1, next - 1);
 
@@ -142,8 +142,9 @@ class Combat {
         int bonus = player.getAttackBonus();
         boolean hit = hits(roll, bonus, enemy.armorClass());
         io.report(flavour.pick((hit ? "combat.hit." : "combat.miss.") + classKey()));
-        io.report("Dein Angriff: Wurf " + roll + " + " + bonus + " = " + (roll + bonus)
-                + " gegen RK " + enemy.armorClass() + " -> " + (hit ? "TREFFER" : "VERFEHLT"));
+        String attackLine = "Dein Angriff: Wurf " + roll + " + " + bonus + " = " + (roll + bonus)
+                + " gegen RK " + enemy.armorClass() + " -> " + (hit ? "TREFFER" : "VERFEHLT");
+        io.report(hit ? Ansi.green(attackLine) : attackLine);
         if (!hit) {
             return;
         }
@@ -161,13 +162,13 @@ class Combat {
     private void cast(Spell spell) {
         switch (spell) {
             case FIREBALL -> {
-                io.report(flavour.pick("combat.fireball"));
+                io.report(Ansi.blue(flavour.pick("combat.fireball")));
                 damageEnemy(dice.rollD10());
             }
             case SHIELD -> {
                 shieldBonus += Spell.SHIELD_BONUS;
-                io.report(flavour.pick("combat.shield"));
-                io.report("Dein Schutzschild gibt dir +" + Spell.SHIELD_BONUS + " Ruestungsklasse.");
+                io.report(Ansi.blue(flavour.pick("combat.shield")));
+                io.report(Ansi.blue("Dein Schutzschild gibt dir +" + Spell.SHIELD_BONUS + " Ruestungsklasse."));
             }
             default -> throw new IllegalStateException("Spell not usable in combat: " + spell);
         }
@@ -193,7 +194,7 @@ class Combat {
         }
         int damage = dice.roll(enemy.damageDie());
         player.takeDamage(damage);
-        io.report("Du nimmst " + damage + " Schaden.");
+        io.report(Ansi.red("Du nimmst " + damage + " Schaden."));
     }
 
     /** Eine 1 verfehlt immer, eine 20 trifft immer, sonst zaehlt Wurf + Bonus gegen die Ruestungsklasse. */
